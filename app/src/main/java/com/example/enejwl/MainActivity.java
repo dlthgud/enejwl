@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static Level level[] = new Level[MAX_LEVEL + 1];
     public static Mole mole[] = new Mole[1];
+    public static Item[] items = {bomb};
     int curLevel;
     public static int lastLevel = 1;
 
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             final ImageButton imageView = (ImageButton) findViewById(R.id.imageView);
             imageView.setVisibility(View.VISIBLE);
             if(bool == 0) {
-                // TODO 실패 화면
+                //  실패 화면
                 start.setVisibility(View.GONE);
                 imageView.setImageResource(R.drawable.loser);
                 imageView.setOnClickListener(new View.OnClickListener() {
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             } else if(bool == 1) {
-                // TODO 성공 화면
+                //  성공 화면
                 imageView.bringToFront();
                 imageView.setImageResource(R.drawable.win);
                 imageView.setOnClickListener(new View.OnClickListener() {
@@ -101,20 +102,24 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //  두더지 객체 생성
-        mole[0] = new Mole("두더지", 3, 3, 2, 5, R.drawable.enejwl);
+        mole[0] = new Mole("두더지", 1, 1, 2, 5, R.drawable.enejwl);
 
 
         //  아이템 객체 생성
-        Item[] items = {bomb};
+//        Item[] items = {bomb};
         // 레벨 객체 생성
-        int[] map_3 = {0,1,0,1,1,1,0,1,0};
+        int[] map_3 = new int[9];
+        for (int i=0; i<9; i++) {
+            map_3[i] = 1;
+        }
+//        int[] map_3 = {0,1,0,1,1,1,0,1,0};
 //        int[] map_4 = {1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0};
         int[] map_5 = new int[25];
         for (int i=0; i<25; i++) {
             map_5[i] = 1;
         }
-        level[1] = new Level(map_3, 3, 3, 40, 1, 0, mole, null);
-        level[2] = new Level(map_5, 5, 5, 50, 1, 0, mole, items);
+        level[1] = new Level(map_3, 3, 3, 40, 30, 0, mole, null);
+        level[2] = new Level(map_5, 5, 5, 50, 40, 0, mole, items);
 
         radioGroup = (RadioGroup) findViewById(R.id.level);
 
@@ -190,13 +195,16 @@ public class MainActivity extends AppCompatActivity {
                             level[2].setCondition(3);
                             break;
                     }
+                    // intent에서 "curLevel" curLevel 값 보내기
+                    Intent intent = new Intent(getApplicationContext(), GameActivity.class);
+                    intent.putExtra("curLevel", curLevel);
+                    startActivity(intent);  // GameActivity 전환
                 } else {
-                    // TODO 레벨 조건 입력
+                    CustomDialog customDialog = new CustomDialog(MainActivity.this);
+                    customDialog.callFunction(level);
+                    //  레벨 조건 입력
                 }
-                // intent에서 "curLevel" curLevel 값 보내기
-                Intent intent = new Intent(getApplicationContext(), GameActivity.class);
-                intent.putExtra("curLevel", curLevel);
-                startActivity(intent);  // GameActivity 전환
+
             }
         });
     }

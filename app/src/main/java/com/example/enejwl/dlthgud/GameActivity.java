@@ -201,7 +201,7 @@ public class GameActivity extends AppCompatActivity {
 
             }
 
-            if (level >= 2) {
+            if (curLevel.getItemArr() != null) {
                     new Thread(new IThread(0)).start();
             }
         }
@@ -336,9 +336,12 @@ public class GameActivity extends AppCompatActivity {
 
                     Thread.sleep(downtime); // 두더지가 내려가 있는 시간
 
-                    msg1.arg1 = index;
-                    msg1.obj = moles[anum];
-                    upHandler.sendMessage(msg1);
+                    ItemInfo info1 = (ItemInfo) ((ImageButton) hole[index]).getTag();
+                    if(info1.getName().equals("0")) {
+                        msg1.arg1 = index;
+                        msg1.obj = moles[anum];
+                        upHandler.sendMessage(msg1);
+                    }
 
                     Thread.sleep(uptime);
 
@@ -397,6 +400,9 @@ public class GameActivity extends AppCompatActivity {
                         position = new Random().nextInt(hole.length);
                         Log.v("position", "position 반복문 안 " + position);
                         //
+                        if(map[position] == NONE) {
+                            continue;
+                        }
                         ItemInfo info = (ItemInfo) ((ImageButton) hole[position]).getTag();
                         if(info.getName().equals("0"))
                             break;
@@ -488,5 +494,10 @@ public class GameActivity extends AppCompatActivity {
             // 폭탄일 때 하기
         }
     };
+
+    @Override
+    public void onBackPressed() {
+
+    }
 }
 
