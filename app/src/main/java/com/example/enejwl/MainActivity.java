@@ -18,6 +18,8 @@ public class MainActivity extends AppCompatActivity {
     public static int lastLevel = 1;
     final int MAX_LEVEL = 2;
 
+
+
     RadioGroup radioGroup;
     RadioGroup end_mode;
 
