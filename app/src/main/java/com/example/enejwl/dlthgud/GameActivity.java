@@ -35,9 +35,7 @@ public class GameActivity extends AppCompatActivity {
     Thread thread = null;
 
     final String TAG_ON = "on"; //태그용
-
     final String TAG_OFF = "off";
-
     final String TAG_NONE = "none";
 
     ImageButton[] hole;
@@ -45,17 +43,19 @@ public class GameActivity extends AppCompatActivity {
     final int LOWER_BOUND = -1;
     final int UPPER_BOUND = 3;
 
-    final int NONE = 1;
-    final int EMPTY = 0;
-    final int MOLE = 2;
-    final int BOMB = 3;
+    final int NONE = 0; // 안 하는 거
+    final int EMPTY = 1;    // 사용하는 거
+    final int MOLE = 2; // 두더지
+    final int BOMB = 3; // 아이템
 
     final int END_TIME = 0;
     final int END_COUNT = 1;
 
-    int a_second;
+    int a_second;   // 속도
 
     int level;
+
+    final int MAX_HEIGHT = 500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,58 +83,39 @@ public class GameActivity extends AppCompatActivity {
             end_method = curLevel.getEnd();
 
             hole = new ImageButton[width * height];
-            // curLevel.map에 따라 hole 초기화
 
+            // curLevel.map에 따라 hole 초기화
             String pkgName = getPackageName();
 
+            int h = MAX_HEIGHT / height;
             final int WIDTH = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 0, getResources().getDisplayMetrics());
-
-            final int HEIGHT = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 101, getResources().getDisplayMetrics());
-
+            final int HEIGHT = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, h, getResources().getDisplayMetrics());
             final LinearLayout linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     WIDTH, HEIGHT, 1f
             );
 
             int n = 0;
-
             for (int i = 0; i < height; i++) {
-//                TableRow tableRow = new TableRow(GameActivity.this);
-//                tableRow.setLayoutParams(new TableLayout.LayoutParams(
-//                        ViewGroup.LayoutParams.MATCH_PARENT,
-//                        HEIGHT
-//                ));
                 LinearLayout linearLayout1 = new LinearLayout(this);
                 linearLayout1.setOrientation(LinearLayout.HORIZONTAL);
 
                 for(int j = 0; j < width; j++) {
                     final ImageButton button = new ImageButton(GameActivity.this);
-//                    int img_id = getResources().getIdentifier("imageView" + n, "id", pkgName);
-//                    Log.d("hole", "play: " + "imageView" + n);
-//                    hole[n].setId(img_id);
                     button.setId(n+1);
                     button.setLayoutParams(params);
                     button.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                    hole[n] = button;
-//                    hole[n].setLayoutParams(new TableLayout.LayoutParams(
-//                            WIDTH,
-//                            HEIGHT, 1f
-//                    ));
 
-//                    hole[n] = (ImageButton) findViewById(img_id);
+                    hole[n] = button;
 
                     if (map[n] == EMPTY) {
-
                         hole[n].setVisibility(View.VISIBLE);
                         hole[n].setImageResource(R.drawable.ic_launcher_foreground);
-
                         hole[n].setTag(TAG_OFF);
-
                     } else if(map[n] == NONE) {
                         hole[n].setVisibility(View.INVISIBLE);
                         hole[n].setTag(TAG_NONE);
                     }
-
 
                     hole[n].setOnClickListener(new View.OnClickListener() { //두더지이미지에 온클릭리스너
                         // 화면 터치시 터치 수를 감소시키고, 터치 수가 0이 되면 해당하는
@@ -205,11 +186,9 @@ public class GameActivity extends AppCompatActivity {
             }
 
             for(int i = 0; i<hole.length; i++){
-
                 if(curLevel.getMap()[i] == EMPTY) {
                     new Thread(new DThread(i)).start();
                 }
-
             }
         }
     }
@@ -238,7 +217,6 @@ public class GameActivity extends AppCompatActivity {
                 message.arg1 = i;
                 timeHandler.sendMessage(message);   // 시간 출력
                 try {
-
                     Thread.sleep(a_second);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -252,20 +230,20 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private int end(int score) {    // 게임이 끝났을 때 승패 판별을 담당하는 함수이다.
+        MainActivity mainActivity = (MainActivity) MainActivity.mainActivity;
+        mainActivity.finish();
+
+        Intent intent = new Intent(GameActivity.this, MainActivity.class);
+        intent.putExtra("curLevel", level);
+
 //        int score; // 현재 점수를 매개변수로 받는다.
         if(score >= count){
-            Intent intent = new Intent(GameActivity.this, MainActivity.class);
-
             intent.putExtra("isWin", 1);
-            intent.putExtra("curLevel", level);
 
             startActivity(intent);
             return 1;
         } else {
-            Intent intent = new Intent(GameActivity.this, MainActivity.class);
-
             intent.putExtra("isWin", 0);
-            intent.putExtra("curLevel", level);
 
             startActivity(intent);
             return 0;
