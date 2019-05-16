@@ -13,18 +13,18 @@ import android.widget.Toast;
 
 import com.example.enejwl.dlthgud.BackKeyClickHandler;
 import com.example.enejwl.dlthgud.GameActivity;
+import com.example.enejwl.dlthgud.Item;
 import com.example.enejwl.dlthgud.Level;
 import com.example.enejwl.dlthgud.Mole;
 
 public class MainActivity extends AppCompatActivity {
     public static Activity mainActivity;
     private BackKeyClickHandler backKeyClickHandler;
-
+    public static Item bomb = new Item("bomb", 1, 0, 5, 3, R.drawable.bomb,5);
     final static int MAX_LEVEL = 2;
 
     public static Level level[] = new Level[MAX_LEVEL + 1];
     public static Mole mole[] = new Mole[1];
-
     int curLevel;
     public static int lastLevel = 1;
 
@@ -78,8 +78,10 @@ public class MainActivity extends AppCompatActivity {
 
         // TODO 두더지 객체 생성
         mole[0] = new Mole("두더지", 3, 3, 2, 5, R.drawable.enejwl);
-        // TODO 아이템 객체 생성
 
+
+        // TODO 아이템 객체 생성
+        Item[] items = {bomb};
         // 레벨 객체 생성
         int[] map_3 = {0,1,0,1,1,1,0,1,0};
 //        int[] map_4 = {1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0};
@@ -87,8 +89,8 @@ public class MainActivity extends AppCompatActivity {
         for (int i=0; i<25; i++) {
             map_5[i] = 1;
         }
-        level[1] = new Level(map_3, 3, 3, 40, 1, 0);
-        level[2] = new Level(map_5, 5, 5, 50, 1, 0);
+        level[1] = new Level(map_3, 3, 3, 40, 1, 0, mole, null);
+        level[2] = new Level(map_5, 5, 5, 50, 1, 0, mole, items);
 
         radioGroup = (RadioGroup) findViewById(R.id.level);
 
