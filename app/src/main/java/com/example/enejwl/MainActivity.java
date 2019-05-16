@@ -56,8 +56,8 @@ public class MainActivity extends AppCompatActivity {
         // 받기 실패 시 bool = -1
         int bool = getIntent().getIntExtra("isWin",-1);
         // intent에서 "curLevel" curLevel 값에 받기
-        // 받기 실패 시 curLevel = -1
-        curLevel = getIntent().getIntExtra("curLevel", -1);
+        // 받기 실패 시 curLevel = 1
+        curLevel = getIntent().getIntExtra("curLevel", 1);
 
         if (bool > -1){
             if(bool == 0) {
