@@ -83,6 +83,12 @@ public class MainActivity extends AppCompatActivity {
                 // TODO 성공 화면
                 imageView.bringToFront();
                 imageView.setImageResource(R.drawable.win);
+                imageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        imageView.setVisibility(View.GONE);
+                    }
+                });
                 curLevel++; // 레벨 업
                 if(curLevel > MAX_LEVEL) {
                     curLevel = MAX_LEVEL;
