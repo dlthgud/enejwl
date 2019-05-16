@@ -32,9 +32,7 @@ public class Mole { // 두더지의 정보를 저장하는 클래스
         this.image = image;
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
     public int getTouch() {
         return touch;
