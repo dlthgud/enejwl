@@ -81,42 +81,48 @@ public class CustomDialog {
             @Override
             public void onClick(View v) {
                 if(!width.getText().toString().equals("") && !height.getText().toString().equals("")) {
+                    int widthInt=Integer.parseInt(width.getText().toString());
+                    int heightInt=Integer.parseInt(height.getText().toString());
                     layout.removeAllViews();
                     mapHeight = Integer.parseInt(height.getText().toString());
                     mapWidth = Integer.parseInt(width.getText().toString());
-
-                    btn = new Button[mapWidth][mapHeight];
-                    LinearLayout linear[] = new LinearLayout[mapHeight];
-                    for (int j = 0; j < mapHeight; j++) {
-                        linear[j] = new LinearLayout(context);
-                        layout.addView(linear[j]);
+                    if(mapWidth>6 || mapWidth<3 || mapHeight>6 || mapHeight<3){
+                        Toast.makeText(context, "잘못된 크기입니다.", Toast.LENGTH_SHORT).show();
                     }
-                    int h = MAX_HEIGHT / mapHeight;
-                    final int WIDTH = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 0, context.getResources().getDisplayMetrics());
-                    final int HEIGHT = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, h, context.getResources().getDisplayMetrics());
+                        else{
+                        btn = new Button[mapWidth][mapHeight];
+                        LinearLayout linear[] = new LinearLayout[mapHeight];
+                        for (int j = 0; j < mapHeight; j++) {
+                            linear[j] = new LinearLayout(context);
+                            layout.addView(linear[j]);
+                        }
+                        int h = MAX_HEIGHT / mapHeight;
+                        final int WIDTH = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 0, context.getResources().getDisplayMetrics());
+                        final int HEIGHT = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, h, context.getResources().getDisplayMetrics());
 //                    final LinearLayout linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                            WIDTH, HEIGHT, 1f
-                    );
-                    for (int j = 0; j < mapHeight; j++) {
-                        for (int i = 0; i < mapWidth; i++) {
-                            btn[i][j] = new Button(context);
-                            btn[i][j].setLayoutParams(params);
-                            btn[i][j].setId((i + 1) * (j + 1));
-                            btn[i][j].setTag("1");
-                            linear[j].addView(btn[i][j]);
-                            btn[i][j].setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if (v.getTag() == "0") {
-                                        v.setTag("1");
-                                        v.setBackgroundColor(Color.GREEN);
-                                    } else {
-                                        v.setTag("0");
-                                        v.setBackgroundColor(Color.BLUE);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                WIDTH, HEIGHT, 1f
+                        );
+                        for (int j = 0; j < mapHeight; j++) {
+                            for (int i = 0; i < mapWidth; i++) {
+                                btn[i][j] = new Button(context);
+                                btn[i][j].setLayoutParams(params);
+                                btn[i][j].setId((i + 1) * (j + 1));
+                                btn[i][j].setTag("1");
+                                linear[j].addView(btn[i][j]);
+                                btn[i][j].setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        if (v.getTag() == "0") {
+                                            v.setTag("1");
+                                            v.setBackgroundColor(Color.GREEN);
+                                        } else {
+                                            v.setTag("0");
+                                            v.setBackgroundColor(Color.BLUE);
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            }
                         }
                     }
                     aBoolean = true;
@@ -126,6 +132,7 @@ public class CustomDialog {
         });
 
         okButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
                 if(!width.getText().toString().equals("")
@@ -135,46 +142,56 @@ public class CustomDialog {
                 && aBoolean
                 && mapWidth == Integer.parseInt(width.getText().toString())
                 && mapHeight == Integer.parseInt(height.getText().toString())) {
-                    mapUser = new int[mapWidth * mapHeight];
-                    String str = "";
-                    int num = 0;
-                    for (int j = 0; j < mapHeight; j++) {
-                        for (int i = 0; i < mapWidth; i++) {
-                            mapUser[num] = Integer.parseInt(btn[i][j].getTag().toString());
-                            str += btn[i][j].getTag();
-                            num++;
-                        }
-                    }
-                    Log.d("custom", "mapUser: " + str);
+                    int limitInt = Integer.parseInt(limit.getText().toString());
+                    int totalNumInt = Integer.parseInt(totalNum.getText().toString());
+                    if ((endType == 1 && limitInt > 5)   // limit 검사
+                            || (endType == 0 && (limitInt>180 || limitInt<10))
+                            || totalNumInt > 50  || totalNumInt<10  // 두더지수 검사
+                    ) {
+                        Toast.makeText(context, "하나 이상의 입력이 잘못되었습니다.", Toast.LENGTH_SHORT).show();
 
-                    //level[0]에 정보 집어넣기
-                    //int[] map_3 = {0,1,0,1,1,1,0,1,0};
-
-                    Log.d("custom", "height: " + mapHeight);
-
-                    if (itemCheck.isChecked()) {
-                        level[0] = new Level(mapUser,
-                                Integer.parseInt(width.getText().toString()),
-                                Integer.parseInt(height.getText().toString()),
-                                Integer.parseInt(limit.getText().toString()),
-                                Integer.parseInt(totalNum.getText().toString()),
-                                endType, MainActivity.mole, MainActivity.items);
                     } else {
-                        level[0] = new Level(mapUser,
-                                Integer.parseInt(width.getText().toString()),
-                                Integer.parseInt(height.getText().toString()),
-                                Integer.parseInt(limit.getText().toString()),
-                                Integer.parseInt(totalNum.getText().toString()),
-                                endType, MainActivity.mole, null);
+                        mapUser = new int[mapWidth * mapHeight];
+                        String str = "";
+                        int num = 0;
+                        for (int j = 0; j < mapHeight; j++) {
+                            for (int i = 0; i < mapWidth; i++) {
+                                mapUser[num] = Integer.parseInt(btn[i][j].getTag().toString());
+                                str += btn[i][j].getTag();
+                                num++;
+                            }
+                        }
+                        Log.d("custom", "mapUser: " + str);
+
+                        //level[0]에 정보 집어넣기
+                        //int[] map_3 = {0,1,0,1,1,1,0,1,0};
+
+                        Log.d("custom", "height: " + mapHeight);
+
+                        if (itemCheck.isChecked()) {
+                            level[0] = new Level(mapUser,
+                                    Integer.parseInt(width.getText().toString()),
+                                    Integer.parseInt(height.getText().toString()),
+                                    Integer.parseInt(limit.getText().toString()),
+                                    Integer.parseInt(totalNum.getText().toString()),
+                                    endType, MainActivity.mole, MainActivity.items);
+                        } else {
+                            level[0] = new Level(mapUser,
+                                    Integer.parseInt(width.getText().toString()),
+                                    Integer.parseInt(height.getText().toString()),
+                                    Integer.parseInt(limit.getText().toString()),
+                                    Integer.parseInt(totalNum.getText().toString()),
+                                    endType, MainActivity.mole, null);
+                        }
+
+                        // 커스텀 다이얼로그를 종료한다.
+                        dlg.dismiss();
+                        // intent에서 "curLevel" curLevel 값 보내기
+                        Intent intent = new Intent(context, GameActivity.class);
+
+                        intent.putExtra("curLevel", 0);
+                        context.startActivity(intent);  // GameActivity 전환
                     }
-
-                    // 커스텀 다이얼로그를 종료한다.
-                    dlg.dismiss();
-                    // intent에서 "curLevel" curLevel 값 보내기
-                    Intent intent = new Intent(context, GameActivity.class);
-
-                    intent.putExtra("curLevel", 0);
-                    context.startActivity(intent);  // GameActivity 전환
                 }
             }
         });
