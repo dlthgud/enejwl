@@ -6,37 +6,37 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <TextView
-            android:text="맵 가로/세로:"
-            android:layout_width="0dp"
-            android:layout_weight="3"
-            android:layout_height="wrap_content" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="맵 가로/세로:" />
+
         <EditText
             android:id="@+id/c_width"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:hint="가로"
-            android:inputType="number"
-            android:layout_width="0dp"
-            android:layout_weight="3"
-            android:layout_height="wrap_content" />
+            android:inputType="number" />
+
         <TextView
-            android:text="/"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="/" />
+
         <EditText
             android:id="@+id/c_height"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:hint="세로"
-            android:inputType="number"
-            android:layout_width="0dp"
-            android:layout_weight="3"
-            android:layout_height="wrap_content" />
+            android:inputType="number" />
+
         <Button
             android:id="@+id/mapBtn"
-            android:text="체크"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            />
+            android:layout_gravity="right"
+            android:text="체크" />
 
     </LinearLayout>
     <LinearLayout
@@ -145,16 +145,17 @@
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:background="#000000" />
+
         <Button
             android:id="@+id/c_okButton"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_weight="1"
+            android:background="#ffffff"
             android:gravity="center"
             android:text="확인"
             android:textColor="#000000"
-            android:textSize="16dp"
-            android:background="#ffffff"/>
+            android:textSize="16dp" />
 
     </LinearLayout>
     <View

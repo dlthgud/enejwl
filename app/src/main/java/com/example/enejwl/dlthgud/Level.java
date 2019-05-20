@@ -1,9 +1,6 @@
 package com.example.enejwl.dlthgud;
 
-import com.example.enejwl.dlthgud.Mole;
-import com.example.enejwl.dlthgud.Item;
-
-public class Level {
+public class Level {    // 한 레벨의 정보를 저장하는 클래스
     int[] map;  // 맵 정보 배열
     int width;  // 맵의 가로 크기
     int height; // 맵의 세로 크기
