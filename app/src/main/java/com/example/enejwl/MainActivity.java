@@ -200,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     startGame(getApplicationContext(),curLevel);
                 } else {
-                    CustomDialog customDialog = new CustomDialog(MainActivity.this, dpi);   // 다이얼로그 띄우기
+                    CustomDialog customDialog = new CustomDialog(MainActivity.this);   // 다이얼로그 띄우기
                     customDialog.callFunction(level);                    //  레벨 조건 입력
                 }
 

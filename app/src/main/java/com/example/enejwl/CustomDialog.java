@@ -2,7 +2,6 @@ package com.example.enejwl;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -20,7 +19,7 @@ import com.example.enejwl.dlthgud.Level;
 
 public class CustomDialog {
     private Context context;
-    private int dpi;
+    private int flagNum;
 
     private int endType=0; //종료방식
     private int mapWidth; //맵 가로
@@ -32,8 +31,9 @@ public class CustomDialog {
 
     final int MAX_HEIGHT = 300;
 
+    final int MAP_MIN = 3;
     final int MAX = 6;
-    final int MIN = 3;
+    final int MIN = 2;
 
     final int MAX_NUM = 5;
 
@@ -49,9 +49,8 @@ public class CustomDialog {
     EditText limit;
     EditText totalNum;
 
-    public CustomDialog(Context context, int dpi){
+    public CustomDialog(Context context){
         this.context = context;
-        this.dpi = dpi;
     }
 
     public void callFunction(final Level[] level){
@@ -116,6 +115,7 @@ public class CustomDialog {
                         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                                 WIDTH, HEIGHT, 1f
                         );
+                        flagNum = mapHeight*mapWidth;
                         for (int j = 0; j < mapHeight; j++) {
                             for (int i = 0; i < mapWidth; i++) {
                                 btn[i][j] = new Button(context);
@@ -128,10 +128,12 @@ public class CustomDialog {
                                     public void onClick(View v) {
                                         if (v.getTag() == String.valueOf(GameActivity.NONE)) {
                                             v.setTag(String.valueOf(GameActivity.EMPTY));
-                                            v.setBackgroundColor(Color.GREEN);
+                                            v.setAlpha(1);
+                                            flagNum++;
                                         } else {
                                             v.setTag(String.valueOf(GameActivity.NONE));
-                                            v.setBackgroundColor(Color.BLUE);
+                                            v.setAlpha(0.1f);
+                                            flagNum--;
                                         }
                                     }
                                 });
@@ -147,7 +149,12 @@ public class CustomDialog {
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(test()) {
+                Log.d("구멍", "onClick: " + flagNum);
+                if(flagNum<MAP_MIN){
+                    aBoolean = false;
+                    Toast.makeText(context, "맵에 3개 이상의 구멍이 있어야합니다.", Toast.LENGTH_SHORT).show();
+                }
+                else if(test()) {
                     int limitInt = Integer.parseInt(limit.getText().toString());
                     int totalNumInt = Integer.parseInt(totalNum.getText().toString());
                     if ((endType == GameActivity.END_COUNT && limitInt > MAX_NUM)   // limit 검사
@@ -196,13 +203,14 @@ public class CustomDialog {
                         MainActivity.startGame(context, 0);
                     }
                 }
+                else{
+                    Toast.makeText(context, "입력을 해주세요.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context, "취소 했습니다.", Toast.LENGTH_SHORT).show();
-
                 // 커스텀 다이얼로그를 종료한다.
                 dlg.dismiss();
             }
