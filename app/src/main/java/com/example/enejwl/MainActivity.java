@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,16 +22,16 @@ import com.example.enejwl.dlthgud.Mole;
 public class MainActivity extends AppCompatActivity {
     public static Activity mainActivity;
     private BackKeyClickHandler backKeyClickHandler;
-    public static Item bomb = new Item("bomb", 1, 0, 5, 3, R.drawable.bomb,5);
     final static int MAX_LEVEL = 2;
 
     public static Level level[] = new Level[MAX_LEVEL + 1];
     public static Mole mole[] = new Mole[1];
-    public static Item[] items = {bomb};
+    public static Item bomb = new Item("bomb", 1, 0, 5, 3, R.drawable.bomb,5);
+    public static Item[] items = {bomb};    // 아이템 객체 생성
     int curLevel;
     public static int lastLevel = 1;
 
-
+    int dpi;
 
     RadioGroup radioGroup;
     RadioGroup end_mode;
@@ -42,10 +43,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        dpi = metrics.densityDpi;
+
         mainActivity = MainActivity.this;
         backKeyClickHandler = new BackKeyClickHandler(this);
 
-        init();
+        main();
     }
 
     @Override
@@ -53,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         backKeyClickHandler.onBackPressed();
     }
 
-    private void init() {
+    private void main() {   // 전체적인 흐름을 진행하는 함수
         String package_name = getPackageName();
 
         start=findViewById(R.id.start);
@@ -104,9 +109,6 @@ public class MainActivity extends AppCompatActivity {
         //  두더지 객체 생성
         mole[0] = new Mole("두더지", 1, 1, 2, 5, R.drawable.enejwl);
 
-
-        //  아이템 객체 생성
-//        Item[] items = {bomb};
         // 레벨 객체 생성
         int[] map_3 = new int[9];
         for (int i=0; i<9; i++) {
@@ -200,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
                     intent.putExtra("curLevel", curLevel);
                     startActivity(intent);  // GameActivity 전환
                 } else {
-                    CustomDialog customDialog = new CustomDialog(MainActivity.this);
+                    CustomDialog customDialog = new CustomDialog(MainActivity.this, dpi);
                     customDialog.callFunction(level);
                     //  레벨 조건 입력
                 }

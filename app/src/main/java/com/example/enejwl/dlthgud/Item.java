@@ -1,6 +1,6 @@
 package com.example.enejwl.dlthgud;
 
-public class Item {
+public class Item { // 아이템의 정보를 저장하는 클래스
     String name; // 아이템 이름
     int touch; // 아이템 클릭을 위한 터치 수
     int score; // 아이템 클릭 시 점수
