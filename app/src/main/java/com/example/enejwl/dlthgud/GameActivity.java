@@ -19,7 +19,6 @@ import com.example.enejwl.R;
 
 import java.util.Random;
 
-
 public class GameActivity extends AppCompatActivity {
     TextView time;
     TextView scoreView;
@@ -33,31 +32,27 @@ public class GameActivity extends AppCompatActivity {
     int[] map;  // 맵
     int end_method; // 종료 방식
 
-    Thread thread = null;
-
-    final String TAG_ON = "on"; //태그용
-    final String TAG_OFF = "off";
-    final String TAG_NONE = "none";
-
-    ImageButton[] hole;
-
-    final int LOWER_BOUND = -1;
-//    final int UPPER_BOUND = 3;
-
-    final int NONE = 0; // 안 하는 거
-    final int EMPTY = 1;    // 사용하는 거
-    final int MOLE = 2; // 두더지
-    final int BOMB = 3; // 아이템
-
     Mole[] moles;
     Item[] items;
 
-    final int END_TIME = 0;
-    final int END_COUNT = 1;
+    ImageButton[] hole;
 
     int a_second;   // 속도
 
     int level;
+
+    Thread thread = null;
+
+    public static final int NONE = 0; // 안 하는 거
+    public static final int EMPTY = 1;    // 사용하는 거
+
+    public final static int END_TIME = 0;
+    public final static int END_COUNT = 1;
+
+    final String TAG_NONE = "none";
+
+    final int LOWER_BOUND = -1;
+//    final int UPPER_BOUND = 3;
 
     final int MAX_HEIGHT = 500;
 
@@ -119,9 +114,7 @@ public class GameActivity extends AppCompatActivity {
                         Log.v("태그", "그림1");
                         hole[n].setImageResource(R.drawable.ic_launcher_foreground);
                         //
-//                        hole[n].setTag(TAG_OFF);
                         ItemInfo itemInfo = new ItemInfo("0", 0);
-//                hole[i].setTag(new String[]{"0", "0"});
                         hole[n].setTag(itemInfo);
                     } else if (map[n] == NONE) {
                         hole[n].setVisibility(View.INVISIBLE);
@@ -135,39 +128,38 @@ public class GameActivity extends AppCompatActivity {
 
                         public void onClick(View v) {
 //                            if(!((ImageButton) v).getTag().getClass().equals(String.class)) {
-                                ItemInfo info = (ItemInfo) ((ImageButton) v).getTag();
-                                //  터치 수 --
-                                info.setTouch(info.getTouch() - 1);
-                                //  터치 수 = 0?
-                                if (info.getTouch() == 0) {
+                            ItemInfo info = (ItemInfo) ((ImageButton) v).getTag();
+                            //  터치 수 --
+                            info.setTouch(info.getTouch() - 1);
+                            //  터치 수 = 0?
+                            if (info.getTouch() == 0) {
 //  두더지? 폭탄?
-                                    if (((ImageButton) v).getTag().getClass().equals(MoleInfo.class)) {
-                                        Toast.makeText(getApplicationContext(), "good", Toast.LENGTH_LONG).show();
+                                if (((ImageButton) v).getTag().getClass().equals(MoleInfo.class)) { // 두더지
+                                    Toast.makeText(getApplicationContext(), "good", Toast.LENGTH_LONG).show();
 //  score += 점수
-                                        score += ((MoleInfo) info).getScore();
+                                    score += ((MoleInfo) info).getScore();
 
 
-                                    } else if (((ImageButton) v).getTag().getClass().equals(ItemInfo.class))  {
-                                        if (info.getName().equals("bomb")) {
-                                            Toast.makeText(getApplicationContext(), "bomb", Toast.LENGTH_LONG).show();
-                                            Log.v("태그", "폭탄 전 점수 : " + score);
-                                            score += bomb();
-                                            Log.v("태그", "폭탄 후 점수 : " + score);
+                                } else if (((ImageButton) v).getTag().getClass().equals(ItemInfo.class)) {
+                                    if (info.getName().equals("bomb")) {    // 폭탄
+                                        Toast.makeText(getApplicationContext(), "bomb", Toast.LENGTH_LONG).show();
+                                        Log.v("태그", "폭탄 전 점수 : " + score);
+                                        int plus = bomb();
+                                        score += plus;
+                                        Log.v("태그", "폭탄 후 점수 : " + score);
 
-                                        }
                                     }
-                                    scoreView.setText(String.valueOf(score));
-                                    Log.v("태그", "그림2");
-                                    ((ImageButton) v).setImageResource(R.drawable.ic_launcher_foreground);
-                                    //
-                                    ItemInfo itemInfo = new ItemInfo("0", 0);
-//                hole[i].setTag(new String[]{"0", "0"});
-                                    v.setTag(itemInfo);
-//                                    v.setTag(TAG_OFF);
-
                                 }
+                                scoreView.setText(String.valueOf(score));
+                                Log.v("태그", "그림2");
+                                // hole 초기화
+                                ((ImageButton) v).setImageResource(R.drawable.ic_launcher_foreground);
+                                //
+                                ItemInfo itemInfo = new ItemInfo("0", 0);
+                                v.setTag(itemInfo);
+
                             }
-//                        }
+                        }
                     });
                     linearLayout1.addView(hole[n]);
 
@@ -194,6 +186,7 @@ public class GameActivity extends AppCompatActivity {
                 //onClick 함수만 호출
             }
 
+            // AThread 시작
             for(int i = 0; i<hole.length; i++){
                 if(curLevel.getMap()[i] == EMPTY) {
                     new Thread(new AThread(i)).start();
@@ -201,6 +194,7 @@ public class GameActivity extends AppCompatActivity {
 
             }
 
+            // iThread 시작
             if (curLevel.getItemArr() != null) {
                     new Thread(new IThread(0)).start();
             }
@@ -242,55 +236,6 @@ public class GameActivity extends AppCompatActivity {
             finish();   // 종료
         }
     }
-
-    private int end(int score) {    // 게임이 끝났을 때 승패 판별을 담당하는 함수이다.
-        MainActivity mainActivity = (MainActivity) MainActivity.mainActivity;
-        mainActivity.finish();
-
-        Intent intent = new Intent(GameActivity.this, MainActivity.class);
-        intent.putExtra("curLevel", level);
-
-//        int score; // 현재 점수를 매개변수로 받는다.
-        if (score >= count) {
-            intent.putExtra("isWin", 1);
-
-            startActivity(intent);
-            return 1;
-        } else {
-            intent.putExtra("isWin", 0);
-
-            startActivity(intent);
-            return 0;
-        }
-    };
-
-    private int bomb() {    // 폭탄 아이템을 사용할 때 맵 위에 있는 두더지의 총 점수를 계산하고         더하는 함수
-      int hap = 0;  // 아이템을 사용해서 얻는 점수를 저장
-
-      for(int i = 0; i<hole.length; i++) {
-          if (((ImageButton) hole[i]).getTag().getClass().equals(MoleInfo.class)) {  // hole[i].getTag() == TAG_ON
-              //  hap += 두더지의 점수
-              if (((ImageButton) hole[i]).getTag().getClass().equals(MoleInfo.class)) {
-                  Toast.makeText(getApplicationContext(), "good", Toast.LENGTH_LONG).show();
-//  score += 점수
-                  MoleInfo moleInfo = (MoleInfo) hole[i].getTag();
-                  hap += moleInfo.getScore();
-
-
-              }
-//              map[i] = EMPTY;
-//              hole[i].setTag(TAG_OFF);
-              Log.v("태그", "그림3");
-                hole[i].setImageResource(R.drawable.ic_launcher_foreground);
-//
-              ItemInfo itemInfo = new ItemInfo("0", 0);
-//                hole[i].setTag(new String[]{"0", "0"});
-              hole[i].setTag(itemInfo);
-
-          }
-      }
-      return hap;
-    };
 
     Handler timeHandler = new Handler() {    // TextView에 시간을 출력하는 Handler 객체
         @Override
@@ -337,7 +282,7 @@ public class GameActivity extends AppCompatActivity {
                     Thread.sleep(downtime); // 두더지가 내려가 있는 시간
 
                     ItemInfo info1 = (ItemInfo) ((ImageButton) hole[index]).getTag();
-                    if(info1.getName().equals("0")) {
+                    if(info1.getName().equals("0")) {   // 아이템이 올라와 있는 구멍이 아니면
                         msg1.arg1 = index;
                         msg1.obj = moles[anum];
                         upHandler.sendMessage(msg1);
@@ -349,7 +294,7 @@ public class GameActivity extends AppCompatActivity {
                     // 단위 검사 - 올라와 있는 시간 랜덤하게 잘 설정되는지 확인
 
                     ItemInfo info = (ItemInfo) ((ImageButton) hole[index]).getTag();
-                    if(!info.getName().equals("0")) {
+                    if(!info.getName().equals("0")) {   // 두더지를 못 잡았으면
                         msg2.arg1 = index;
                         msg2.obj = moles[anum];
                         downHandler.sendMessage(msg2);
@@ -400,11 +345,11 @@ public class GameActivity extends AppCompatActivity {
                         position = new Random().nextInt(hole.length);
                         Log.v("position", "position 반복문 안 " + position);
                         //
-                        if(map[position] == NONE) {
+                        if(map[position] == NONE) { // 사용하지 않는 구멍
                             continue;
                         }
                         ItemInfo info = (ItemInfo) ((ImageButton) hole[position]).getTag();
-                        if(info.getName().equals("0"))
+                        if(info.getName().equals("0"))  // 빈 구멍
                             break;
                     }
                     Log.v("position", "position 반복문 밖 " + position);
@@ -415,7 +360,7 @@ public class GameActivity extends AppCompatActivity {
                     Thread.sleep(uptime);
 
                     ItemInfo info = (ItemInfo) ((ImageButton) hole[position]).getTag();
-                    if(!info.getName().equals("0")) {
+                    if(!info.getName().equals("0")) {   // 못 눌렀으면
                         msg2.arg1 = position;
                         msg2.obj = items[inum];
                         downHandler.sendMessage(msg2);
@@ -438,13 +383,11 @@ public class GameActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
 
-
             if (msg.obj.getClass() == Mole.class) { // 올라온 것이 두더지 일 때
                 Mole amole = (Mole) msg.obj;
                 MoleInfo moleInfo = new MoleInfo(amole.getName(), amole.getTouch(), amole.getScore());
                 hole[msg.arg1].setTag(moleInfo);
                 hole[msg.arg1].setImageResource(amole.getImage()); // 이미지 바꿀 수 있어야 함.
-//                map[msg.arg1] = MOLE;
             } else { // 올라온 것이 아이템
                 Item aitem = (Item) msg.obj;
 //                long now = System.currentTimeMillis();
@@ -457,7 +400,6 @@ public class GameActivity extends AppCompatActivity {
                 ItemInfo itemInfo = new ItemInfo(aitem.getName(), aitem.getTouch());
                 hole[msg.arg1].setTag(itemInfo);
                 hole[msg.arg1].setImageResource(aitem.getImage());
-//                map[msg.arg1] = BOMB;
             }
             //  아이템일 때 필요!
         }
@@ -471,9 +413,7 @@ public class GameActivity extends AppCompatActivity {
                 Log.v("태그", "그림4");
                 hole[msg.arg1].setImageResource(R.drawable.ic_launcher_foreground); // 내려간 이미지 출력
                 ItemInfo itemInfo = new ItemInfo("0", 0);
-//                hole[msg.arg1].setTag(new String[]{"0", "0"});
                 hole[msg.arg1].setTag(itemInfo);
-//                map[msg.arg1] = EMPTY;
 
                 if (end_method == END_COUNT) {
                     missed++; // 놓친 두더지 수 증가
@@ -486,9 +426,7 @@ public class GameActivity extends AppCompatActivity {
                 Log.v("태그", "그림5");
                 hole[msg.arg1].setImageResource(R.drawable.ic_launcher_foreground); // 내려간 이미지 출력
                 ItemInfo itemInfo = new ItemInfo("0", 0);
-//                hole[msg.arg1].setTag(new String[]{"0", "0"});
                 hole[msg.arg1].setTag(itemInfo);
-//                map[msg.arg1] = EMPTY;
             }
 
             // 폭탄일 때 하기
@@ -499,5 +437,50 @@ public class GameActivity extends AppCompatActivity {
     public void onBackPressed() {
 
     }
+
+    private int end(int score) {    // 게임이 끝났을 때 승패 판별을 담당하는 함수이다.
+        MainActivity mainActivity = (MainActivity) MainActivity.mainActivity;
+        mainActivity.finish();
+
+        Intent intent = new Intent(GameActivity.this, MainActivity.class);
+        intent.putExtra("curLevel", level);
+
+        if (score >= count) {
+            intent.putExtra("isWin", 1);
+
+            startActivity(intent);
+            return 1;
+        } else {
+            intent.putExtra("isWin", 0);
+
+            startActivity(intent);
+            return 0;
+        }
+    };
+
+    private int bomb() {    // 폭탄 아이템을 사용할 때 맵 위에 있는 두더지의 총 점수를 계산하고         더하는 함수
+        int hap = 0;  // 아이템을 사용해서 얻는 점수를 저장
+
+        for(int i = 0; i<hole.length; i++) {
+            if (((ImageButton) hole[i]).getTag().getClass().equals(MoleInfo.class)) {  // hole[i].getTag() == TAG_ON
+                //  hap += 두더지의 점수
+                if (((ImageButton) hole[i]).getTag().getClass().equals(MoleInfo.class)) {
+                    Toast.makeText(getApplicationContext(), "good", Toast.LENGTH_LONG).show();
+//  score += 점수
+                    MoleInfo moleInfo = (MoleInfo) hole[i].getTag();
+                    hap += moleInfo.getScore();
+
+
+                }
+                Log.v("태그", "그림3");
+                hole[i].setImageResource(R.drawable.ic_launcher_foreground);
+//
+                ItemInfo itemInfo = new ItemInfo("0", 0);
+                hole[i].setTag(itemInfo);
+
+            }
+        }
+        return hap;
+    };
 }
 

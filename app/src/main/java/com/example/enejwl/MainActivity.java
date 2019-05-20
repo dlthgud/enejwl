@@ -1,6 +1,7 @@
 package com.example.enejwl;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -197,18 +198,21 @@ public class MainActivity extends AppCompatActivity {
                             level[2].setCondition(3);
                             break;
                     }
-                    // intent에서 "curLevel" curLevel 값 보내기
-                    Intent intent = new Intent(getApplicationContext(), GameActivity.class);
-                    intent.putExtra("curLevel", curLevel);
-                    startActivity(intent);  // GameActivity 전환
+                    startGame(getApplicationContext(),curLevel);
                 } else {
-                    CustomDialog customDialog = new CustomDialog(MainActivity.this, dpi);
-                    customDialog.callFunction(level);
-                    //  레벨 조건 입력
+                    CustomDialog customDialog = new CustomDialog(MainActivity.this, dpi);   // 다이얼로그 띄우기
+                    customDialog.callFunction(level);                    //  레벨 조건 입력
                 }
 
             }
         });
+    }
+
+    public static void startGame(Context context, int curLevel) {
+        // intent에서 "curLevel" curLevel 값 보내기
+        Intent intent = new Intent(context, GameActivity.class);
+        intent.putExtra("curLevel", curLevel);
+        context.startActivity(intent);  // GameActivity 전환
     }
 }
 
