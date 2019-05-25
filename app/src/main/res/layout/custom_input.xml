@@ -102,6 +102,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
+            android:text="올라와있는 시간 (최소, 최대)"
+            android:layout_width="0dp"
+            android:layout_weight="7"
+            android:layout_height="wrap_content" />
+        <EditText
+            android:id="@+id/c_upTimeMIN"
+            android:inputType="numberDecimal"
+            android:layout_width="0dp"
+            android:layout_weight="3.5"
+            android:layout_height="wrap_content" />
+        <EditText
+            android:id="@+id/c_upTimeMAX"
+            android:inputType="numberDecimal"
+            android:layout_width="0dp"
+            android:layout_weight="3.5"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
             android:text="아이템사용"
             android:layout_width="0dp"
             android:layout_weight="3"

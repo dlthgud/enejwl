@@ -56,6 +56,8 @@ public class GameActivity extends AppCompatActivity {
 
     final int MAX_HEIGHT = 500;
 
+    boolean eBoolean = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,14 +143,17 @@ public class GameActivity extends AppCompatActivity {
 
 
                                 } else if (((ImageButton) v).getTag().getClass().equals(ItemInfo.class)) {
-                                    if (info.getName().equals("bomb")) {    // 폭탄
-                                        Toast.makeText(getApplicationContext(), "bomb", Toast.LENGTH_LONG).show();
-                                        Log.v("태그", "폭탄 전 점수 : " + score);
-                                        int plus = bomb();
-                                        score += plus;
-                                        Log.v("태그", "폭탄 후 점수 : " + score);
-
+                                    Toast.makeText(getApplicationContext(), info.getName(), Toast.LENGTH_LONG).show();
+// TODO
+                                    int intname = -1;
+                                    for (int i=0; i<items.length; i++) {
+                                        if (info.getName().equals(items[i].getName())) {
+                                            intname = i;
+                                            break;
+                                        }
                                     }
+                                    int hap = bomb(intname);
+                                    score += (hap * items[intname].getScore());
                                 }
                                 scoreView.setText(String.valueOf(score));
                                 Log.v("태그", "그림2");
@@ -185,19 +190,9 @@ public class GameActivity extends AppCompatActivity {
                 // AThread와 IThread 시작과
                 //onClick 함수만 호출
             }
-
-            // AThread 시작
-            for(int i = 0; i<hole.length; i++){
-                if(curLevel.getMap()[i] == EMPTY) {
-                    new Thread(new AThread(i)).start();
-                }
-
-            }
-
-            // iThread 시작
-            if (curLevel.getItemArr() != null) {
-                    new Thread(new IThread(0)).start();
-            }
+            // 쓰레드 시작
+            new Thread(new PThread(1, 3, 0.17)).start(); // TODO 각 레벨별 정보 입력해야 함.
+            //두더지 주기 최소, 최대, 아이템과 두더지 비율 순으로 입력하기!!!
         }
     }
 
@@ -250,10 +245,10 @@ public class GameActivity extends AppCompatActivity {
 
 
 
-    /* 두더지 올라갔다 내려가는 함수 */
+    /* 구멍에서 두더지가 올라갔다 내려가는 함수 */
     public class AThread implements Runnable {
 
-        int index = 0; //두더지 나오는 구멍 번호
+        int index = 0; // 나오는 구멍 번호
 
         AThread(int index) {
             this.index = index;
@@ -262,61 +257,125 @@ public class GameActivity extends AppCompatActivity {
         @Override
 
         public void run() {
+            try {
+                int anum = 0;
+                int length = moles.length; // 디비
 
-            while (true) {
+                Message msg1 = new Message();
+                Message msg2 = new Message();
+                double min = moles[anum].getUpMin(); // 올라와 있는 최소
+                double max = moles[anum].getUpMax(); // 올라와 있는 시간 최대
+                int uptime = (int) ((min + new Random().nextDouble() * (max - min)) * 1000); // 두더지 올라와 있는 시간
 
-                try {
-                    int anum = 0;
-                    int length = moles.length;
-                    Message msg1 = new Message();
-                    Message msg2 = new Message();
+                ItemInfo info1 = (ItemInfo) ((ImageButton) hole[index]).getTag();
+                if (info1.getName().equals("0")) {
+                    msg1.arg1 = index;
+                    msg1.arg2 = anum;
+                    msg1.obj = moles[anum];
+                    upHandler.sendMessage(msg1);
+                }
+                Thread.sleep(uptime);
+                ItemInfo info2 = (ItemInfo) ((ImageButton) hole[index]).getTag();
 
-
-                    int downtime = new Random().nextInt(10000); // 두더지가 내려가 있는 시간
-
-                    double min = moles[anum].getUpMin();
-                    double max = moles[anum].getUpMax();
-
-                    int uptime = (int) ((min + new Random().nextDouble() * (max - min)) * 1000); // 두더지가 올라가 있는 시간
-
-                    Thread.sleep(downtime); // 두더지가 내려가 있는 시간
-
-                    ItemInfo info1 = (ItemInfo) ((ImageButton) hole[index]).getTag();
-                    if(info1.getName().equals("0")) {   // 아이템이 올라와 있는 구멍이 아니면
-                        msg1.arg1 = index;
-                        msg1.obj = moles[anum];
-                        upHandler.sendMessage(msg1);
-                    }
-
-                    Thread.sleep(uptime);
-
-                    Log.v("올라와 있는 시간", "올라온 시간 : " + uptime);
-                    // 단위 검사 - 올라와 있는 시간 랜덤하게 잘 설정되는지 확인
-
-                    ItemInfo info = (ItemInfo) ((ImageButton) hole[index]).getTag();
-                    if(!info.getName().equals("0")) {   // 두더지를 못 잡았으면
-                        msg2.arg1 = index;
-                        msg2.obj = moles[anum];
-                        downHandler.sendMessage(msg2);
-                    }
-                } catch (InterruptedException e) {
-
-                    e.printStackTrace();
+                if (!info2.getName().equals("0")) {
+                    msg2.arg1 = index;
+                    msg2.arg2 = anum;
+                    msg2.obj = moles[anum];
+                    downHandler.sendMessage(msg2);
 
                 }
 
-            }
+            } catch (InterruptedException e) {
 
+                e.printStackTrace();
+
+            }
+            return;
         }
 
     }
 
     /* 아이템 올라갔다 내려가는 함수 */
     public class IThread implements Runnable {
-        int inum = 0; //
+        int index = 0; //
 
-        IThread(int _num) {
-            this.inum = _num;
+        IThread(int index) {
+            this.index = index;
+        }
+
+        @Override
+
+        public void run() {
+            try {
+                int length = items.length; //item 배열의 길이
+                Message msg1 = new Message();
+                Message msg2 = new Message();
+
+                double min = items[0].getUpMin();
+                double max = items[0].getUpMax();
+                int uptime = (int) ((min + new Random().nextDouble() * (max - min)) * 1000); // 아이템 올라가 있는 시간
+
+                if (length > 1) { //아이템이 2개 이상일 때 나올 확률별로 나오게 하기
+                    if (makeRandom(0.5)) {
+                        msg1.arg1 = index;
+                        msg1.arg2 = 0;
+                        msg1.obj = items[0];
+                        msg2.arg1 = index;
+                        msg2.arg2 = 0;
+                        msg2.obj = items[0];
+
+                    } else {
+                        msg1.arg1 = index;
+                        msg1.arg2 = 1;
+                        msg1.obj = items[1];
+                        msg2.arg1 = index;
+                        msg2.arg2 = 1;
+                        msg2.obj = items[1];
+
+                    }
+                } else { //아니면 그냥 나오게 하기
+                    msg1.arg1 = index;
+                    msg1.arg2 = 0;
+                    msg1.obj = items[0];
+                    msg2.arg1 = index;
+                    msg2.arg2 = 0;
+                    msg2.obj = items[0];
+
+                }
+                ItemInfo info1 = (ItemInfo) ((ImageButton) hole[index]).getTag();
+                if (info1.getName().equals("0")) {
+                    upHandler.sendMessage(msg1);
+                }
+
+                Thread.sleep(uptime);
+
+                ItemInfo info2 = (ItemInfo) ((ImageButton) hole[index]).getTag();
+                if (!info2.getName().equals("0")) {
+                    downHandler.sendMessage(msg2);
+
+                }
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            return;
+        }
+
+    }
+
+    /* 아이템, 두더지 올라갔다 내려가는 함수 - 총 관리하는 함수 */
+    public class PThread implements Runnable {
+        double minP; // 주기 최소 시간
+        double maxP; // 주기 최대 시간
+        double possibility;
+
+        PThread(double minP, double maxP, double possibility) {
+            this.minP = minP;
+            this.maxP = maxP;
+            this.possibility = possibility;
         }
 
         @Override
@@ -326,77 +385,63 @@ public class GameActivity extends AppCompatActivity {
             while (true) {
 
                 try {
-                    int length = items.length; //item 배열의 길이
-                    int position = 0; // 아이템이 나올 위치 정보 저장하는 변수
-
-                    Message msg1 = new Message();
-                    Message msg2 = new Message();
-
-
-                    double min = items[inum].getUpMin();
-                    double max = items[inum].getUpMax();
-                    int uptime = (int) ((min + new Random().nextDouble() * (max - min)) * 1000); // 두더지가 올라가 있는 시간
-
-                    int downtime = items[inum].period - uptime / 1000; // 아이템이 내려가 있는 시간 = 주기....?!
-                    Thread.sleep(downtime * 1000); // 두더지가 내려가 있는 시간
+                    int position = 0; // 구멍 위치 정보 저장하는 변수
+                    int period = (int) ((minP + new Random().nextDouble() * (maxP - minP)) * 1000); // 주기
 
                     /* 맵 상에서 두더지 아이템 아무것도 없는 칸 찾기 */
                     while (true) {
                         position = new Random().nextInt(hole.length);
-                        Log.v("position", "position 반복문 안 " + position);
-                        //
-                        if(map[position] == NONE) { // 사용하지 않는 구멍
+//                        Log.v("position", "position 반복문 안 " + position);
+
+                        if (map[position] == NONE) { // 사용하지 않는 구멍
                             continue;
                         }
                         ItemInfo info = (ItemInfo) ((ImageButton) hole[position]).getTag();
-                        if(info.getName().equals("0"))  // 빈 구멍
+                        if (info.getName().equals("0"))  // 빈 구멍
                             break;
                     }
-                    Log.v("position", "position 반복문 밖 " + position);
-                    msg1.arg1 = position;
-                    msg1.obj = items[inum];
-                    upHandler.sendMessage(msg1);
 
-                    Thread.sleep(uptime);
+                    if (items == null) { // 아이템이 없는 경우
+                        Log.v("쓰레드", "잘나옴");
+                        // 두더지 쓰레드 생성
+                        new Thread(new AThread(position)).start();
+                        Log.v("쓰레드", "두더지쓰레드 생성");
+                    } else {  // 아이템이 있는 경우 - 두더지 쓰레드와 아이템 쓰레드 비율에 맞게 생성
+                        if (makeRandom(possibility)) {
+                            new Thread(new IThread(position)).start(); //아이템일 때
+                            Log.v("쓰레드", "아이템쓰레드 생성");
+                        } else {
+                            new Thread(new AThread(position)).start();
+                            Log.v("쓰레드", "두더지쓰레드 생성");
 
-                    ItemInfo info = (ItemInfo) ((ImageButton) hole[position]).getTag();
-                    if(!info.getName().equals("0")) {   // 못 눌렀으면
-                        msg2.arg1 = position;
-                        msg2.obj = items[inum];
-                        downHandler.sendMessage(msg2);
+                        }
                     }
 
+
+                    Thread.sleep(period); // 잠들기
+
                 } catch (InterruptedException e) {
-
                     e.printStackTrace();
-
                 }
 
+                if (eBoolean) return;
             }
-
         }
-
     }
 
     Handler upHandler = new Handler() {
-
         @Override
         public void handleMessage(Message msg) {
 
             if (msg.obj.getClass() == Mole.class) { // 올라온 것이 두더지 일 때
                 Mole amole = (Mole) msg.obj;
+                // TODO msg.arg2
                 MoleInfo moleInfo = new MoleInfo(amole.getName(), amole.getTouch(), amole.getScore());
                 hole[msg.arg1].setTag(moleInfo);
                 hole[msg.arg1].setImageResource(amole.getImage()); // 이미지 바꿀 수 있어야 함.
             } else { // 올라온 것이 아이템
                 Item aitem = (Item) msg.obj;
-//                long now = System.currentTimeMillis();
-//                Date date = new Date(now);
-//                SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-//                String getTime = sdfNow.format(date);
-//                Log.v("폭탄", "폭탄 시간 : " + getTime);
-                // 폭탄 주기 확인을 위한 단위검사
-
+                // TODO msg.arg2
                 ItemInfo itemInfo = new ItemInfo(aitem.getName(), aitem.getTouch());
                 hole[msg.arg1].setTag(itemInfo);
                 hole[msg.arg1].setImageResource(aitem.getImage());
@@ -410,26 +455,24 @@ public class GameActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             if (msg.obj.getClass() == Mole.class) {
-                Log.v("태그", "그림4");
                 hole[msg.arg1].setImageResource(R.drawable.ic_launcher_foreground); // 내려간 이미지 출력
                 ItemInfo itemInfo = new ItemInfo("0", 0);
                 hole[msg.arg1].setTag(itemInfo);
 
+
                 if (end_method == END_COUNT) {
                     missed++; // 놓친 두더지 수 증가
-                    time.setText(condition-missed + "마리");
+                    time.setText(condition - missed + "마리");
                     if (missed == condition) {
                         end(score); // 종료 함수 호출
                     }
                 }
-            } else {    // 폭탄
-                Log.v("태그", "그림5");
+            } else {   // 폭탄
                 hole[msg.arg1].setImageResource(R.drawable.ic_launcher_foreground); // 내려간 이미지 출력
                 ItemInfo itemInfo = new ItemInfo("0", 0);
                 hole[msg.arg1].setTag(itemInfo);
-            }
 
-            // 폭탄일 때 하기
+            }
         }
     };
 
@@ -442,8 +485,11 @@ public class GameActivity extends AppCompatActivity {
         MainActivity mainActivity = (MainActivity) MainActivity.mainActivity;
         mainActivity.finish();
 
+        eBoolean = true;
+
         Intent intent = new Intent(GameActivity.this, MainActivity.class);
         intent.putExtra("curLevel", level);
+        intent.putExtra("end", end_method);
 
         if (score >= count) {
             intent.putExtra("isWin", 1);
@@ -458,7 +504,17 @@ public class GameActivity extends AppCompatActivity {
         }
     };
 
-    private int bomb() {    // 폭탄 아이템을 사용할 때 맵 위에 있는 두더지의 총 점수를 계산하고         더하는 함수
+    private boolean makeRandom(double num) {
+        double result = 0;
+        double random = Math.random(); //0~1 실수
+        if (random <= num) {
+            return true; //특정 확률 안이면 true
+        } else {
+            return false; //특정 확률 밖이면 false
+        }
+    }
+
+    private int bomb(boolean b) {    // 폭탄 아이템을 사용할 때 맵 위에 있는 두더지의 총 점수를 계산하고         더하는 함수
         int hap = 0;  // 아이템을 사용해서 얻는 점수를 저장
 
         for(int i = 0; i<hole.length; i++) {
@@ -466,6 +522,7 @@ public class GameActivity extends AppCompatActivity {
                 //  hap += 두더지의 점수
                 if (((ImageButton) hole[i]).getTag().getClass().equals(MoleInfo.class)) {
                     Toast.makeText(getApplicationContext(), "good", Toast.LENGTH_LONG).show();
+
 //  score += 점수
                     MoleInfo moleInfo = (MoleInfo) hole[i].getTag();
                     hap += moleInfo.getScore();
@@ -482,5 +539,62 @@ public class GameActivity extends AppCompatActivity {
         }
         return hap;
     };
+
+    private int bomb(int b) {    // 폭탄 아이템을 사용할 때 맵 위에 있는 두더지의 총 점수를 계산하고         더하는 함수
+        int hap = 0;  // 아이템을 사용해서 얻는 점수를 저장
+
+        for(int i = 0; i<hole.length; i++) {
+            if (((ImageButton) hole[i]).getTag().getClass().equals(MoleInfo.class)) {  // hole[i].getTag() == TAG_ON
+                //  hap += 두더지의 점수
+                if (((ImageButton) hole[i]).getTag().getClass().equals(MoleInfo.class)) {
+                    Toast.makeText(getApplicationContext(), "good", Toast.LENGTH_LONG).show();
+
+                    if (end_method == END_COUNT) {
+                        missed += items[b].getPeriod();   // 놓친 것으로 카운트
+
+                        time.setText(condition - missed + "마리");
+                        if (missed == condition) {
+                            end(score); // 종료 함수 호출
+                        }
+                    }
+//  score += 점수
+                    MoleInfo moleInfo = (MoleInfo) hole[i].getTag();
+                    hap += moleInfo.getScore();
+
+
+                }
+                Log.v("태그", "그림3");
+                hole[i].setImageResource(R.drawable.ic_launcher_foreground);
+//
+                ItemInfo itemInfo = new ItemInfo("0", 0);
+                hole[i].setTag(itemInfo);
+
+            }
+        }
+        return hap;
+    };
+
+    private void bell() {   // 두더지들을 몽땅 놓치는
+        for(int i = 0; i<hole.length; i++) {
+            if (((ImageButton) hole[i]).getTag().getClass().equals(MoleInfo.class)) {  // hole[i].getTag() == TAG_ON
+                if (((ImageButton) hole[i]).getTag().getClass().equals(MoleInfo.class)) {
+                    Toast.makeText(getApplicationContext(), "good", Toast.LENGTH_LONG).show();
+                    missed++;   // 놓친 것으로 카운트
+
+                    time.setText(condition-missed + "마리");
+                    if (missed == condition) {
+                        end(score); // 종료 함수 호출
+                    }
+                }
+
+                // 두더지들은 사라지지만
+                hole[i].setImageResource(R.drawable.ic_launcher_foreground);
+//
+                ItemInfo itemInfo = new ItemInfo("0", 0);
+                hole[i].setTag(itemInfo);
+
+            }
+        }
+    }
 }
 

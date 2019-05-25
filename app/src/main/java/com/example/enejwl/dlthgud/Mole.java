@@ -4,8 +4,8 @@ public class Mole { // 두더지의 정보를 저장하는 클래스
     String name;    // 두더지 이름
     int touch;  // 두더지를 없애기 위한 터치 수
     int score;  // 점수
-    int upMax;  // 두더지가 올라와 있는 최대 시간
-    int upMin;  // 두더지가 올라와 있는 최소 시간
+    double upMax;  // 두더지가 올라와 있는 최대 시간
+    double upMin;  // 두더지가 올라와 있는 최소 시간
     int image;  // 화면에 나타날 이미지
 
     public void setName(String name) {
@@ -20,11 +20,11 @@ public class Mole { // 두더지의 정보를 저장하는 클래스
         this.score = score;
     }
 
-    public void setUpMax(int upMax) {
+    public void setUpMax(double upMax) {
         this.upMax = upMax;
     }
 
-    public void setUpMin(int upMin) {
+    public void setUpMin(double upMin) {
         this.upMin = upMin;
     }
 
@@ -42,11 +42,11 @@ public class Mole { // 두더지의 정보를 저장하는 클래스
         return score;
     }
 
-    public int getUpMax() {
+    public double getUpMax() {
         return upMax;
     }
 
-    public int getUpMin() {
+    public double getUpMin() {
         return upMin;
     }
 
@@ -54,7 +54,7 @@ public class Mole { // 두더지의 정보를 저장하는 클래스
         return image;
     }
 
-    public Mole(String name, int touch, int score, int upMax, int upMin, int image) {
+    public Mole(String name, int touch, int score, double upMax, double upMin, int image) {
         this.name = name;
         this.touch = touch;
         this.score = score;

@@ -19,7 +19,6 @@ import com.example.enejwl.dlthgud.Level;
 
 public class CustomDialog {
     private Context context;
-    private int flagNum;
 
     private int endType=0; //종료방식
     private int mapWidth; //맵 가로
@@ -32,6 +31,8 @@ public class CustomDialog {
     final int MAX_HEIGHT = 300;
 
     final int MAP_MIN = 3;
+    private int flagNum=MAP_MIN;
+
     final int MAX = 6;
     final int MIN = 2;
 
@@ -43,11 +44,16 @@ public class CustomDialog {
     final int MAX_T = 50;
     final int MIN_T = 10;
 
+    final double MIN_UP = 0.5;
+    final double MAX_UP = 3.0;
+
     EditText width;
     EditText height;
     TextView text;
     EditText limit;
     EditText totalNum;
+    EditText upTimeMin;
+    EditText upTimeMax;
 
     public CustomDialog(Context context){
         this.context = context;
@@ -71,6 +77,8 @@ public class CustomDialog {
         text = (TextView) dlg.findViewById(R.id.c_text);
         limit = (EditText) dlg.findViewById(R.id.c_limit);
         totalNum = (EditText) dlg.findViewById(R.id.c_totalNum);
+        upTimeMin = (EditText) dlg.findViewById(R.id.c_upTimeMIN);
+        upTimeMax = (EditText) dlg.findViewById(R.id.c_upTimeMAX);
         final CheckBox itemCheck = (CheckBox) dlg.findViewById(R.id.c_itemCheck);
         final Button okButton = (Button) dlg.findViewById(R.id.c_okButton);
         final Button cancelButton = (Button) dlg.findViewById(R.id.c_cancelButton);
@@ -157,11 +165,14 @@ public class CustomDialog {
                 else if(test()) {
                     int limitInt = Integer.parseInt(limit.getText().toString());
                     int totalNumInt = Integer.parseInt(totalNum.getText().toString());
+                    double minUp = Double.parseDouble(upTimeMin.getText().toString());
+                    double maxUp = Double.parseDouble(upTimeMax.getText().toString());
                     if ((endType == GameActivity.END_COUNT && limitInt > MAX_NUM)   // limit 검사
                             || (endType == GameActivity.END_TIME && (limitInt>MAX_TIME || limitInt<MIN_TIME))
                             || totalNumInt > MAX_T  || totalNumInt<MIN_T  // 두더지수 검사
+                            || minUp>maxUp || minUp<MIN_UP || maxUp>MAX_UP
                     ) {
-                        Toast.makeText(context, "하나 이상의 입력이 잘못되었습니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "입력이 잘못되었습니다.", Toast.LENGTH_SHORT).show();
 
                     } else {
                         mapUser = new int[mapWidth * mapHeight];
@@ -180,6 +191,19 @@ public class CustomDialog {
                         //int[] map_3 = {0,1,0,1,1,1,0,1,0};
 
                         Log.d("custom", "height: " + mapHeight);
+
+                        for (int i=0; i<MainActivity.mole.length; i++) {
+                            MainActivity.mole[i].setUpMin(minUp);
+                            MainActivity.mole[i].setUpMax(maxUp);
+                        }
+
+                            for (int i=0; i<MainActivity.items.length; i++) {
+                                MainActivity.items[i].setUpMin(minUp);
+                                MainActivity.items[i].setUpMax(maxUp);
+                                Log.d("minmax", "onClick: " + MainActivity.items[i].getName() + MainActivity.items[i].getUpMin()
+                                + MainActivity.items[i].getUpMax());
+                            }
+//                        MainActivity.mole[0] = new Mole("두더지", 1, 1, Integer.parseInt(upTimeMax.getText().toString()), Integer.parseInt(upTimeMin.getText().toString()), R.drawable.enejwl);
 
                         // level[0]에 사용자로부터 받은 값 레벨 객체로 저장
                         if (itemCheck.isChecked()) {
@@ -225,6 +249,8 @@ public class CustomDialog {
         if (totalNum.getText().toString().equals("")) return false;
         if (mapWidth != Integer.parseInt(width.getText().toString())) return false;
         if (mapHeight != Integer.parseInt(height.getText().toString())) return false;
+        if (upTimeMin.getText().toString().equals("")) return false;
+        if (upTimeMax.getText().toString().equals("")) return false;
         else return aBoolean;
     }
 }
