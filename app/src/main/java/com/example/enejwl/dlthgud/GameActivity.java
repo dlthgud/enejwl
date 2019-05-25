@@ -144,7 +144,7 @@ public class GameActivity extends AppCompatActivity {
 
                                 } else if (((ImageButton) v).getTag().getClass().equals(ItemInfo.class)) {
                                     Toast.makeText(getApplicationContext(), info.getName(), Toast.LENGTH_LONG).show();
-// TODO
+//
                                     int intname = -1;
                                     for (int i=0; i<items.length; i++) {
                                         if (info.getName().equals(items[i].getName())) {
@@ -270,7 +270,7 @@ public class GameActivity extends AppCompatActivity {
                 ItemInfo info1 = (ItemInfo) ((ImageButton) hole[index]).getTag();
                 if (info1.getName().equals("0")) {
                     msg1.arg1 = index;
-                    msg1.arg2 = anum;
+//                    msg1.arg2 = anum;
                     msg1.obj = moles[anum];
                     upHandler.sendMessage(msg1);
                 }
@@ -279,7 +279,7 @@ public class GameActivity extends AppCompatActivity {
 
                 if (!info2.getName().equals("0")) {
                     msg2.arg1 = index;
-                    msg2.arg2 = anum;
+//                    msg2.arg2 = anum;
                     msg2.obj = moles[anum];
                     downHandler.sendMessage(msg2);
 
@@ -318,27 +318,27 @@ public class GameActivity extends AppCompatActivity {
                 if (length > 1) { //아이템이 2개 이상일 때 나올 확률별로 나오게 하기
                     if (makeRandom(0.5)) {
                         msg1.arg1 = index;
-                        msg1.arg2 = 0;
+//                        msg1.arg2 = 0;
                         msg1.obj = items[0];
                         msg2.arg1 = index;
-                        msg2.arg2 = 0;
+//                        msg2.arg2 = 0;
                         msg2.obj = items[0];
 
                     } else {
                         msg1.arg1 = index;
-                        msg1.arg2 = 1;
+//                        msg1.arg2 = 1;
                         msg1.obj = items[1];
                         msg2.arg1 = index;
-                        msg2.arg2 = 1;
+//                        msg2.arg2 = 1;
                         msg2.obj = items[1];
 
                     }
                 } else { //아니면 그냥 나오게 하기
                     msg1.arg1 = index;
-                    msg1.arg2 = 0;
+//                    msg1.arg2 = 0;
                     msg1.obj = items[0];
                     msg2.arg1 = index;
-                    msg2.arg2 = 0;
+//                    msg2.arg2 = 0;
                     msg2.obj = items[0];
 
                 }
@@ -435,13 +435,13 @@ public class GameActivity extends AppCompatActivity {
 
             if (msg.obj.getClass() == Mole.class) { // 올라온 것이 두더지 일 때
                 Mole amole = (Mole) msg.obj;
-                // TODO msg.arg2
+                //  msg.arg2
                 MoleInfo moleInfo = new MoleInfo(amole.getName(), amole.getTouch(), amole.getScore());
                 hole[msg.arg1].setTag(moleInfo);
                 hole[msg.arg1].setImageResource(amole.getImage()); // 이미지 바꿀 수 있어야 함.
             } else { // 올라온 것이 아이템
                 Item aitem = (Item) msg.obj;
-                // TODO msg.arg2
+                //  msg.arg2
                 ItemInfo itemInfo = new ItemInfo(aitem.getName(), aitem.getTouch());
                 hole[msg.arg1].setTag(itemInfo);
                 hole[msg.arg1].setImageResource(aitem.getImage());
