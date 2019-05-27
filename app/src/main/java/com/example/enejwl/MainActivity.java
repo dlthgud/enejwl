@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     public static Level level[] = new Level[MAX_LEVEL + 1];
     public static Mole mole[] = new Mole[MOLE_NUM];
     public static Item bomb = new Item("bomb", 1, 1, 5, 3, R.drawable.bomb,0);  // 폭탄
-    public static Item bell = new Item("bell", 1, -1, 5,3, R.drawable.bell, 1);   // 비상벨
+    public static Item bell = new Item("bell", 1, 0, 5,3, R.drawable.bell, 1);   // 비상벨
     public static Item[] items = {bomb, bell};    // 아이템 객체 생성
     int curLevel;
     public static int lastLevel[] = {1, 1};
@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i=0; i<25; i++) {
             map_5[i] = 1;
         }
-        level[1] = new Level(map_3, 3, 3, 40, 3, 0, mole, null);
+        level[1] = new Level(map_3, 3, 3, 40, 30, 0, mole, null);
         level[2] = new Level(map_5, 5, 5, 50, 40, 0, mole, items);
 
         radioGroup = (RadioGroup) findViewById(R.id.level);

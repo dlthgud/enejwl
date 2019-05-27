@@ -1,6 +1,7 @@
 package com.example.enejwl.dlthgud;
 
 import android.app.Activity;
+import android.support.v4.app.ActivityCompat;
 import android.widget.Toast;
 
 public class BackKeyClickHandler {
@@ -17,7 +18,7 @@ public class BackKeyClickHandler {
             return;
         }
         if (System.currentTimeMillis() <= backKeyClickTime + 2000) {
-            activity.finish();
+            ActivityCompat.finishAffinity(activity);
         }
     }
 
