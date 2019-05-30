@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i=0; i<25; i++) {
             map_5[i] = 1;
         }
-        level[1] = new Level(map_3, 3, 3, 40, 30, 0, mole, null);
+        level[1] = new Level(map_3, 3, 3, 40, 3, 0, mole, null);
         level[2] = new Level(map_5, 5, 5, 50, 40, 0, mole, items);
 
         radioGroup = (RadioGroup) findViewById(R.id.level);

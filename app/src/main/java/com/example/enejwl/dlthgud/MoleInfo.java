@@ -11,8 +11,8 @@ public class MoleInfo extends ItemInfo {
         this.score = score;
     }
 
-    public MoleInfo(String name, int touch, int score) {
-        super(name, touch);
+    public MoleInfo(String name, int touch, int score, int index) {
+        super(name, touch, index);
         this.score = score;
     }
 }
