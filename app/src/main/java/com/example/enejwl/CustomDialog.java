@@ -11,6 +11,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +20,7 @@ import com.example.enejwl.dlthgud.Level;
 
 public class CustomDialog {
     private Context context;
+    private int flagNum;
 
     private int endType=0; //종료방식
     private int mapWidth; //맵 가로
@@ -30,22 +32,29 @@ public class CustomDialog {
 
     final int MAX_HEIGHT = 300;
 
-    final int MAP_MIN = 3;
-    private int flagNum=MAP_MIN;
+    final int MAP_MIN = 3;  // 최소 구멍
 
+    // 맵 크기
     final int MAX = 6;
     final int MIN = 2;
 
-    final int MAX_NUM = 5;
+    final int MAX_NUM = 5;  // 놓칠 수 있는 두더지 수
 
+    // 시간 제한
     final int MAX_TIME = 180;
     final int MIN_TIME = 10;
 
+    // 잡아야 하는 두더지 수
     final int MAX_T = 50;
     final int MIN_T = 10;
 
+    // 올라와있는 시간
     final double MIN_UP = 0.5;
     final double MAX_UP = 3.0;
+
+    // TODO 주기
+
+    int sksdleh; //난이도
 
     EditText width;
     EditText height;
@@ -54,6 +63,11 @@ public class CustomDialog {
     EditText totalNum;
     EditText upTimeMin;
     EditText upTimeMax;
+    EditText downTimeMin;
+    EditText downTimeMax;
+    TextView itemText;
+    EditText itemProb;
+    CheckBox itemCheck;
 
     public CustomDialog(Context context){
         this.context = context;
@@ -79,12 +93,37 @@ public class CustomDialog {
         totalNum = (EditText) dlg.findViewById(R.id.c_totalNum);
         upTimeMin = (EditText) dlg.findViewById(R.id.c_upTimeMIN);
         upTimeMax = (EditText) dlg.findViewById(R.id.c_upTimeMAX);
-        final CheckBox itemCheck = (CheckBox) dlg.findViewById(R.id.c_itemCheck);
+        downTimeMin = (EditText) dlg.findViewById(R.id.c_downTimeMIN);
+        downTimeMax = (EditText) dlg.findViewById(R.id.c_downTimeMAX);
+        itemText = (TextView) dlg.findViewById(R.id.c_itemText);
+        itemProb = (EditText) dlg.findViewById(R.id.c_itemProb);
+        itemCheck = (CheckBox) dlg.findViewById(R.id.c_itemCheck);
         final Button okButton = (Button) dlg.findViewById(R.id.c_okButton);
         final Button cancelButton = (Button) dlg.findViewById(R.id.c_cancelButton);
         final RadioButton option1 = (RadioButton) dlg.findViewById(R.id.c_endtime);
         final RadioButton option2 = (RadioButton) dlg.findViewById(R.id.c_endmiss);
+        final RadioGroup difficulty = (RadioGroup) dlg.findViewById(R.id.c_difficulty);
         final Button mapBtn = (Button) dlg.findViewById(R.id.mapBtn);
+
+        difficulty.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {    // 난이도
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId){
+                    case R.id.c_normal:
+                        sksdleh = 0;
+                        break;
+                    case R.id.c_hard:
+                        sksdleh = 1;
+                        break;
+                    case R.id.c_nightmare:
+                        sksdleh = 2;
+                        break;
+                    case R.id.c_korean:
+                        sksdleh = 3;
+                        break;
+                }
+            }
+        });
         option1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,6 +138,21 @@ public class CustomDialog {
                 endType = GameActivity.END_COUNT;
             }
         });
+
+        itemCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(itemCheck.isChecked()){
+                    itemText.setVisibility(View.VISIBLE);
+                    itemProb.setVisibility(View.VISIBLE);
+                }
+                else{
+                    itemText.setVisibility(View.INVISIBLE);
+                    itemProb.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
         final LinearLayout layout = (LinearLayout)dlg.findViewById(R.id.linearLayout);
         mapBtn.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -167,12 +221,22 @@ public class CustomDialog {
                     int totalNumInt = Integer.parseInt(totalNum.getText().toString());
                     double minUp = Double.parseDouble(upTimeMin.getText().toString());
                     double maxUp = Double.parseDouble(upTimeMax.getText().toString());
+                    double minDown = Double.parseDouble(downTimeMin.getText().toString());
+                    double maxDown = Double.parseDouble(downTimeMax.getText().toString());
+                    double item = Double.parseDouble(itemProb.getText().toString());
                     if ((endType == GameActivity.END_COUNT && limitInt > MAX_NUM)   // limit 검사
                             || (endType == GameActivity.END_TIME && (limitInt>MAX_TIME || limitInt<MIN_TIME))
                             || totalNumInt > MAX_T  || totalNumInt<MIN_T  // 두더지수 검사
-                            || minUp>maxUp || minUp<MIN_UP || maxUp>MAX_UP
+                            || minUp>maxUp || minUp<MIN_UP || maxUp>MAX_UP  // 올라와있는 시간
+                            // TODO 주기
+                            || item>100 || item<0
                     ) {
                         Toast.makeText(context, "입력이 잘못되었습니다.", Toast.LENGTH_SHORT).show();
+                        Log.d("입력", "onClick: " +
+                                endType + limitInt + MAX_NUM + MAX_TIME + MIN_TIME
+                                + totalNumInt + MAX_T  + totalNumInt + MIN_T
+                                + minUp + maxUp + minUp + MIN_UP + maxUp + MAX_UP
+                                + item + 1);
 
                     } else {
                         mapUser = new int[mapWidth * mapHeight];
@@ -196,35 +260,26 @@ public class CustomDialog {
                             MainActivity.mole[i].setUpMin(minUp);
                             MainActivity.mole[i].setUpMax(maxUp);
                         }
-
-                            for (int i=0; i<MainActivity.items.length; i++) {
-                                MainActivity.items[i].setUpMin(minUp);
-                                MainActivity.items[i].setUpMax(maxUp);
-                                Log.d("minmax", "onClick: " + MainActivity.items[i].getName() + MainActivity.items[i].getUpMin()
-                                + MainActivity.items[i].getUpMax());
-                            }
+                        for (int i=0; i<MainActivity.items.length; i++) {
+                            MainActivity.items[i].setUpMin(minUp);
+                            MainActivity.items[i].setUpMax(maxUp);
+                        }
 //                        MainActivity.mole[0] = new Mole("두더지", 1, 1, Integer.parseInt(upTimeMax.getText().toString()), Integer.parseInt(upTimeMin.getText().toString()), R.drawable.enejwl);
 
                         // level[0]에 사용자로부터 받은 값 레벨 객체로 저장
                         if (itemCheck.isChecked()) {
                             level[0] = new Level(mapUser,
-                                    Integer.parseInt(width.getText().toString()),
-                                    Integer.parseInt(height.getText().toString()),
-                                    Integer.parseInt(limit.getText().toString()),
-                                    Integer.parseInt(totalNum.getText().toString()),
-                                    endType, MainActivity.mole, MainActivity.items);
+                                    mapWidth, mapHeight, limitInt, totalNumInt, endType, MainActivity.mole, MainActivity.items,
+                                    minDown, maxDown, item);
                         } else {
                             level[0] = new Level(mapUser,
-                                    Integer.parseInt(width.getText().toString()),
-                                    Integer.parseInt(height.getText().toString()),
-                                    Integer.parseInt(limit.getText().toString()),
-                                    Integer.parseInt(totalNum.getText().toString()),
-                                    endType, MainActivity.mole, null);
+                                    mapWidth, mapHeight, limitInt, totalNumInt, endType, MainActivity.mole, null,
+                                    minDown,maxDown,0);
                         }
 
                         // 커스텀 다이얼로그를 종료한다.
                         dlg.dismiss();
-                        MainActivity.startGame(context, 0);
+                        MainActivity.startGame(context, 0, sksdleh);
                     }
                 }
                 else{
@@ -251,6 +306,9 @@ public class CustomDialog {
         if (mapHeight != Integer.parseInt(height.getText().toString())) return false;
         if (upTimeMin.getText().toString().equals("")) return false;
         if (upTimeMax.getText().toString().equals("")) return false;
+        if (downTimeMin.getText().toString().equals("")) return false;
+        if(downTimeMax.getText().toString().equals("")) return false;
+        if(itemCheck.isChecked() && itemProb.getText().toString().equals("")) return false;
         else return aBoolean;
     }
 }
