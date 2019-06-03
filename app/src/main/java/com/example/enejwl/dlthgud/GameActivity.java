@@ -23,7 +23,7 @@ import java.util.Random;
 public class GameActivity extends AppCompatActivity {
     TextView time;
     TextView scoreView;
-
+    Thread[] threads;
     ArrayList arrayList = new ArrayList();
 
     final String[] sksdleh = {"Normal", "Hard", "Nightmare", "Korean"};
@@ -68,6 +68,8 @@ public class GameActivity extends AppCompatActivity {
 
     boolean eBoolean = false;
 
+    int isTouch = 0;    // 0: penalty X
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +80,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void play() {
         if (init()) {
+            threads = new Thread[width * height];
             hole = new ImageButton[width * height];
 
             // curLevel.map에 따라 hole 초기화
@@ -124,47 +127,82 @@ public class GameActivity extends AppCompatActivity {
                             ItemInfo info = (ItemInfo) ((ImageButton) v).getTag();
 
                             Log.d("난이도", "index : " + info.getIndex());
-                            //  터치 수 --
-                            info.setTouch(info.getTouch() - 1);
-                            //  터치 수 = 0?
-                            if (info.getTouch() == 0) {
-//  두더지? 폭탄?
-                                if (((ImageButton) v).getTag().getClass().equals(MoleInfo.class)) { // 두더지
-                                    Toast.makeText(getApplicationContext(), "good", Toast.LENGTH_LONG).show();
+                            //  두더지? 폭탄?
+                            if (((ImageButton) v).getTag().getClass().equals(MoleInfo.class)) { // 두더지
+                                Toast.makeText(getApplicationContext(), "good", Toast.LENGTH_LONG).show();
+
+                                boolean en = cursksdleh.equals(sksdleh[0])   // Normal
+                                        || checkIsFirst(info);
+                                if (isTouch == 0
+                                        || en) {
+                                    //  터치 수 --
+                                    info.setTouch(info.getTouch() - 1);
+                                    Log.d("터치 수", "onClick: " + info.getTouch());
+                                } else if (isTouch == 1) {
+                                    Log.d("터치 수", "onClick: penalty");
+                                    info.setTouch(0);
+                                }
+                                //  터치 수 = 0?
+                                if (info.getTouch() == 0) {
 //  score += 점수
-                                    if (cursksdleh.equals(sksdleh[0])   // Normal
-                                            || checkIsFirst(info)) {    // 또는 가장 먼저
+                                    if (en) {    // 또는 가장 먼저
                                         score += ((MoleInfo) info).getScore();  // 점수를 얻고
                                     } else {
                                         if (cursksdleh.equals(sksdleh[1])) { // Hard 난이도
+                                            for (int t=0; t<moles.length; t++) {
+                                                if (info.getName().equals(moles[t].getName())) {
+                                                    info.setTouch(moles[t].getTouch());
+                                                    break;
+                                                }
+                                            }
                                             return; // 아무 반응이 없습니다
                                         }
                                         if (cursksdleh.equals(sksdleh[3])) { // Korean 난이도
                                             score -= ((MoleInfo) info).getScore();  // 점수 감소
-
                                             // 줄어듭니다
                                             decrease(1);
                                         }
                                     }
 
-                                } else if (((ImageButton) v).getTag().getClass().equals(ItemInfo.class)) {  // 아이템
-                                    Toast.makeText(getApplicationContext(), info.getName(), Toast.LENGTH_LONG).show();
-                                    int intname = getIntname(info);
-                                    if (cursksdleh.equals(sksdleh[0]) || cursksdleh.equals(sksdleh[1])  // Normal 이나 Hard
-                                            || intname == 1  // 또는 비상벨
-                                            || checkIsFirst(info)) {    // 또는 가장 먼저
+                                    scoreView.setText(String.valueOf(score) + "점");
+                                    Log.v("태그", "그림2");
+                                    // hole 초기화
+                                    holeInit(v, info.getIndex());
+
+                                    Log.d("난이도", "제대로 클릭 빼기 : " + String.valueOf(info.getIndex()));
+                                }
+
+                            } else if (((ImageButton) v).getTag().getClass().equals(ItemInfo.class)) {  // 아이템
+                                Toast.makeText(getApplicationContext(), info.getName(), Toast.LENGTH_LONG).show();
+                                int intname = getIntname(info);
+
+                                boolean dk = cursksdleh.equals(sksdleh[0]) || cursksdleh.equals(sksdleh[1])  // Normal 이나 Hard
+                                        || intname == 1  // 또는 비상벨
+                                        || checkIsFirst(info);
+                                if (isTouch == 0
+                                        || dk) {
+                                    //  터치 수 --
+                                    info.setTouch(info.getTouch() - 1);
+                                    Log.d("터치 수", "onClick: " + info.getTouch());
+                                } else if (isTouch == 1) {
+                                    Log.d("터치 수", "onClick: penalty");
+                                    info.setTouch(0);
+                                }
+                                //  터치 수 = 0?
+                                if (info.getTouch() == 0) {
+                                    if (dk) {    // 또는 가장 먼저
                                         int hap = bomb(intname);
                                         score += (hap * items[intname].getScore());
                                     }
+
+                                    scoreView.setText(String.valueOf(score) + "점");
+                                    Log.v("태그", "그림2");
+                                    // hole 초기화
+                                    holeInit(v, info.getIndex());
+
+                                    Log.d("난이도", "제대로 클릭 빼기 : " + String.valueOf(info.getIndex()));
                                 }
                             }
-
-                            scoreView.setText(String.valueOf(score) + "점");
-                            Log.v("태그", "그림2");
-                            // hole 초기화
-                            holeInit(v, info.getIndex());
-
-                            Log.d("난이도", "제대로 클릭 빼기 : " + String.valueOf(info.getIndex()));
                         }
                     });
                     linearLayout1.addView(hole[n]);
@@ -192,7 +230,7 @@ public class GameActivity extends AppCompatActivity {
                 //onClick 함수만 호출
             }
             // 쓰레드 시작
-            new Thread(new PThread(minP, maxP,p)).start(); // 각 레벨별 정보 입력해야 함.
+            new Thread(new PThread(minP, maxP, p)).start(); // 각 레벨별 정보 입력해야 함.
             //두더지 주기 최소, 최대, 아이템과 두더지 비율 순으로 입력하기!!!
         }
     }
@@ -204,6 +242,13 @@ public class GameActivity extends AppCompatActivity {
 
         ItemInfo itemInfo = new ItemInfo("0", 0, -1);
         v.setTag(itemInfo);
+
+        if (index != -1 && threads[index] != null) {
+            System.out.println(index);
+            threads[index].interrupt();
+
+        }
+        ////////////나중에 하기 쓰레드
     }
 
     private int getIntname(ItemInfo info) {  // 아이템 번호
@@ -331,8 +376,11 @@ public class GameActivity extends AppCompatActivity {
                     msg1.arg1 = index;
                     msg1.obj = moles[anum];
                     upHandler.sendMessage(msg1);
+                    Thread.sleep(uptime);
                 }
-                Thread.sleep(uptime);
+
+
+
                 ItemInfo info2 = (ItemInfo) ((ImageButton) hole[index]).getTag();
 
                 if (!info2.getName().equals("0")) {
@@ -342,10 +390,11 @@ public class GameActivity extends AppCompatActivity {
 
                 }
 
+
             } catch (InterruptedException e) {
-
                 e.printStackTrace();
-
+            } finally {
+                System.out.println("쓰레드 죽었음");
             }
             return;
         }
@@ -397,9 +446,9 @@ public class GameActivity extends AppCompatActivity {
                 ItemInfo info1 = (ItemInfo) ((ImageButton) hole[index]).getTag();
                 if (info1.getName().equals("0")) {
                     upHandler.sendMessage(msg1);
+                    Thread.sleep(uptime);
                 }
 
-                Thread.sleep(uptime);
 
                 ItemInfo info2 = (ItemInfo) ((ImageButton) hole[index]).getTag();
                 // Korean 난이도에서는 비상벨이 스스로 사라지지 않고 버틴다.
@@ -408,10 +457,12 @@ public class GameActivity extends AppCompatActivity {
 
                 }
 
+
+
             } catch (InterruptedException e) {
-
                 e.printStackTrace();
-
+            } finally {
+                System.out.println("쓰레드 죽었음");
             }
 
             return;
@@ -460,18 +511,23 @@ public class GameActivity extends AppCompatActivity {
                         Log.v("쓰레드", "잘나옴");
                         // 두더지 쓰레드 생성
                         arrayList.add(String.valueOf(position)); // 배열 넣기
-                        new Thread(new AThread(position)).start();
+
+                        threads[position] = new Thread(new AThread(position));
+                        threads[position].start();
+
                         Log.v("쓰레드", "두더지쓰레드 생성");
                     } else {  // 아이템이 있는 경우 - 두더지 쓰레드와 아이템 쓰레드 비율에 맞게 생성
                         if (makeRandom(possibility)) {
                             if (!cursksdleh.equals(sksdleh[1])) {
                                 arrayList.add(String.valueOf(position)); // 배열 넣기
                             }
-                            new Thread(new IThread(position)).start(); //아이템일 때
+                            threads[position] = new Thread(new IThread(position)); //아이템일 때
+                            threads[position].start();
                             Log.v("쓰레드", "아이템쓰레드 생성");
                         } else {
                             arrayList.add(String.valueOf(position)); // 배열 넣기
-                            new Thread(new AThread(position)).start();
+                            threads[position] = new Thread(new AThread(position)); //아이템일 때
+                            threads[position].start();
                             Log.v("쓰레드", "두더지쓰레드 생성");
 
                         }

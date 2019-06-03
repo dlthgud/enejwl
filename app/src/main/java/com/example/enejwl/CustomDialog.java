@@ -52,7 +52,9 @@ public class CustomDialog {
     final double MIN_UP = 0.5;
     final double MAX_UP = 3.0;
 
-    // TODO 주기
+    // 내려가있는 시간
+    final double MIN_DOWN = 0.5;
+    final double MAX_DOWN = 2.0;
 
     int sksdleh; //난이도
 
@@ -60,7 +62,7 @@ public class CustomDialog {
     EditText height;
     TextView text;
     EditText limit;
-    EditText totalNum;
+    EditText totalNum;  // 잡아야 하는 두더지 수
     EditText upTimeMin;
     EditText upTimeMax;
     EditText downTimeMin;
@@ -98,6 +100,7 @@ public class CustomDialog {
         itemText = (TextView) dlg.findViewById(R.id.c_itemText);
         itemProb = (EditText) dlg.findViewById(R.id.c_itemProb);
         itemCheck = (CheckBox) dlg.findViewById(R.id.c_itemCheck);
+        final TextView percent = (TextView) dlg.findViewById(R.id.c_percent);
         final Button okButton = (Button) dlg.findViewById(R.id.c_okButton);
         final Button cancelButton = (Button) dlg.findViewById(R.id.c_cancelButton);
         final RadioButton option1 = (RadioButton) dlg.findViewById(R.id.c_endtime);
@@ -139,16 +142,19 @@ public class CustomDialog {
             }
         });
 
+        // 아이템 사용 체크/체크해제 시 확률 입력란 표시/비표시
         itemCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(itemCheck.isChecked()){
                     itemText.setVisibility(View.VISIBLE);
                     itemProb.setVisibility(View.VISIBLE);
+                    percent.setVisibility(View.VISIBLE);
                 }
                 else{
                     itemText.setVisibility(View.INVISIBLE);
                     itemProb.setVisibility(View.INVISIBLE);
+                    percent.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -216,20 +222,20 @@ public class CustomDialog {
                     aBoolean = false;
                     Toast.makeText(context, "맵에 3개 이상의 구멍이 있어야합니다.", Toast.LENGTH_SHORT).show();
                 }
-                else if(test()) {
-                    int limitInt = Integer.parseInt(limit.getText().toString());
-                    int totalNumInt = Integer.parseInt(totalNum.getText().toString());
-                    double minUp = Double.parseDouble(upTimeMin.getText().toString());
-                    double maxUp = Double.parseDouble(upTimeMax.getText().toString());
-                    double minDown = Double.parseDouble(downTimeMin.getText().toString());
-                    double maxDown = Double.parseDouble(downTimeMax.getText().toString());
-                    double item = Double.parseDouble(itemProb.getText().toString());
-                    if ((endType == GameActivity.END_COUNT && limitInt > MAX_NUM)   // limit 검사
-                            || (endType == GameActivity.END_TIME && (limitInt>MAX_TIME || limitInt<MIN_TIME))
+                else if(test()) {   // 공란이 없음을 검사
+                    int limitInt = Integer.parseInt(limit.getText().toString());    // 제한 조건
+                    int totalNumInt = Integer.parseInt(totalNum.getText().toString());  // 잡아야 하는 두더지 수
+                    double minUp = Double.parseDouble(upTimeMin.getText().toString());  // 올라와 있는 시간 최소
+                    double maxUp = Double.parseDouble(upTimeMax.getText().toString());  // 올라와 있는 시간 최대
+                    double minDown = Double.parseDouble(downTimeMin.getText().toString());  // 내려가 있는 시간 최소
+                    double maxDown = Double.parseDouble(downTimeMax.getText().toString());  // 내려가 있는 시간 최대
+                    int item = Integer.parseInt(itemProb.getText().toString());    // 아이템 확률
+                    if ((endType == GameActivity.END_COUNT && limitInt > MAX_NUM)   // 놓칠 수 있는 두더지 수 검사
+                            || (endType == GameActivity.END_TIME && (limitInt>MAX_TIME || limitInt<MIN_TIME))   // 제한 시간 검사
                             || totalNumInt > MAX_T  || totalNumInt<MIN_T  // 두더지수 검사
                             || minUp>maxUp || minUp<MIN_UP || maxUp>MAX_UP  // 올라와있는 시간
-                            // TODO 주기
-                            || item>100 || item<0
+                            || minDown>maxDown || minDown<MIN_DOWN || maxDown>MAX_DOWN  // 내려가있는 시간
+                            || (itemCheck.isChecked() && (item>100 || item<0))   // 아이템 확률
                     ) {
                         Toast.makeText(context, "입력이 잘못되었습니다.", Toast.LENGTH_SHORT).show();
                         Log.d("입력", "onClick: " +
@@ -270,7 +276,7 @@ public class CustomDialog {
                         if (itemCheck.isChecked()) {
                             level[0] = new Level(mapUser,
                                     mapWidth, mapHeight, limitInt, totalNumInt, endType, MainActivity.mole, MainActivity.items,
-                                    minDown, maxDown, item);
+                                    minDown, maxDown, item*0.01);
                         } else {
                             level[0] = new Level(mapUser,
                                     mapWidth, mapHeight, limitInt, totalNumInt, endType, MainActivity.mole, null,
@@ -297,7 +303,7 @@ public class CustomDialog {
 
     }
 
-    private boolean test() {
+    private boolean test() {    // 공란이 있으면 false 반환, 없으면 aBoolean 반환
         if (width.getText().toString().equals("")) return false;
         if (height.getText().toString().equals("")) return false;
         if (limit.getText().toString().equals("")) return false;

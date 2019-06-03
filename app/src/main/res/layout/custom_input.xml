@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--전체를 감싸는 스크롤뷰-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    <!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--&gt;-->
+    <!-- 스크롤뷰 안에 들어가는 Linear-->
     <LinearLayout
-
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!--맵 크기-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -26,7 +24,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="가로"
-                android:inputType="number" />
+                android:inputType="number"
+                android:maxLength="1"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -38,8 +37,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="세로"
-                android:inputType="number" />
+                android:inputType="number"
+                android:maxLength="1"/>
 
+            <!--체크 버튼-->
             <Button
                 android:id="@+id/mapBtn"
                 android:layout_width="wrap_content"
@@ -49,6 +50,7 @@
 
         </LinearLayout>
 
+        <!--종료 방식 선택-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -59,6 +61,7 @@
                 android:layout_weight="3"
                 android:text="종료방식:" />
 
+            <!--종료 방식 선택 라디오 그룹-->
             <RadioGroup
                 android:id="@+id/c_radio"
                 android:layout_width="0dp"
@@ -81,6 +84,7 @@
 
         </LinearLayout>
 
+        <!--제한 시간 또는 놓칠수 있는 두더지 수-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -100,6 +104,7 @@
                 android:inputType="number" />
         </LinearLayout>
 
+        <!--잡아야 하는 두더지 수 입력-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -118,6 +123,7 @@
                 android:inputType="number" />
         </LinearLayout>
 
+        <!--두더지 올라와 있는 시간 입력-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -128,6 +134,7 @@
                 android:layout_weight="7"
                 android:text="두더지가 올라와 있는 시간 (최소, 최대)" />
 
+            <!--두더지 올라와있는 최소시간-->
             <EditText
                 android:id="@+id/c_upTimeMIN"
                 android:layout_width="0dp"
@@ -135,6 +142,7 @@
                 android:layout_weight="3.5"
                 android:inputType="numberDecimal" />
 
+            <!--두더지 올라와있는 최대시간-->
             <EditText
                 android:id="@+id/c_upTimeMAX"
                 android:layout_width="0dp"
@@ -143,6 +151,7 @@
                 android:inputType="numberDecimal" />
         </LinearLayout>
 
+        <!--두더지 내려가있는 시간 입력-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -153,6 +162,7 @@
                 android:layout_weight="7"
                 android:text="두더지 등장까지 시간 (최소, 최대)" />
 
+            <!--두더지 내려가있는 최소시간-->
             <EditText
                 android:id="@+id/c_downTimeMIN"
                 android:layout_width="0dp"
@@ -160,6 +170,7 @@
                 android:layout_weight="3.5"
                 android:inputType="numberDecimal" />
 
+            <!-- 두더지 내려가있는 최대시간-->
             <EditText
                 android:id="@+id/c_downTimeMAX"
                 android:layout_width="0dp"
@@ -168,6 +179,7 @@
                 android:inputType="numberDecimal" />
         </LinearLayout>
 
+        <!--난이도 선택-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -178,12 +190,14 @@
                 android:layout_weight="3"
                 android:text="난이도" />
 
+            <!--난이도 선택 라디오 그룹-->
             <RadioGroup
                 android:id="@+id/c_difficulty"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="7">
 
+                <!--Normal 난이도-->
                 <RadioButton
                     android:id="@+id/c_normal"
                     android:layout_width="wrap_content"
@@ -191,6 +205,7 @@
                     android:checked="true"
                     android:text="Normal" />
 
+                <!--Hard 난이도-->
                 <RadioButton
                     android:id="@+id/c_hard"
 
@@ -198,12 +213,14 @@
                     android:layout_height="wrap_content"
                     android:text="Hard" />
 
+                <!--Nightmare 난이도-->
                 <RadioButton
                     android:id="@+id/c_nightmare"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Nightmare" />
 
+                <!--Korean 난이도-->
                 <RadioButton
                     android:id="@+id/c_korean"
                     android:layout_width="wrap_content"
@@ -214,11 +231,12 @@
 
         </LinearLayout>
 
-
+        <!-- 아이템 사용 여부 체크, 확률 입력-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <!--아이템 사용 여부-->
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -231,6 +249,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="7" />
 
+            <!-- 아이템 확률 입력 -->
             <TextView
                 android:id="@+id/c_itemText"
                 android:layout_width="0dp"
@@ -244,12 +263,21 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="3.5"
-                android:inputType="numberDecimal"
+                android:inputType="number"
+                android:maxLength="3"
                 android:visibility="invisible" />
+            <TextView
+                android:id="@+id/c_percent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="%"
+                android:visibility="invisible"
+                />
 
         </LinearLayout>
 
-
+        <!--입력창과 버튼 사이 간격-->
         <LinearLayout
             android:id="@+id/linearLayout"
             android:layout_width="match_parent"
@@ -263,11 +291,13 @@
             android:layout_height="1dp"
             android:background="#000000" />
 
+        <!--취소 버튼, 확인 버튼-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:orientation="horizontal">
 
+            <!-- 취소 버튼 -->
             <Button
                 android:id="@+id/c_cancelButton"
                 android:layout_width="match_parent"
@@ -279,11 +309,13 @@
                 android:textColor="#000000"
                 android:textSize="16dp" />
 
+            <!--확인 버튼과 취소 버튼 사이 간격-->
             <View
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
                 android:background="#000000" />
 
+            <!-- 확인 버튼 -->
             <Button
                 android:id="@+id/c_okButton"
                 android:layout_width="match_parent"
@@ -297,10 +329,10 @@
 
         </LinearLayout>
 
+        <!--다이얼로그 맨 아래의 간격-->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="#000000" />
     </LinearLayout>
-    <!--</LinearLayout>-->
 </ScrollView>
