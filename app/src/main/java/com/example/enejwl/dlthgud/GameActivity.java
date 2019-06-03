@@ -27,7 +27,7 @@ public class GameActivity extends AppCompatActivity {
     ArrayList arrayList = new ArrayList();
 
     final String[] sksdleh = {"Normal", "Hard", "Nightmare", "Korean"};
-    String cursksdleh = "Korean"; // 현재 난이도
+    String cursksdleh; // 현재 난이도
 
     int score; //현재점수
     int missed; // 놓친 두더지의 수
@@ -37,6 +37,9 @@ public class GameActivity extends AppCompatActivity {
     int height; //맵의 세로크기
     int[] map;  // 맵
     int end_method; // 종료 방식
+    double minP;    // 주기
+    double maxP;
+    double p;   // 확률
 
     Mole[] moles;
     Item[] items;
@@ -45,13 +48,14 @@ public class GameActivity extends AppCompatActivity {
 
     int a_second;   // 속도
 
-    int level;
+    int level;  // 현재 레벨
 
     Thread thread = null;
 
     public static final int NONE = 0; // 안 하는 거
     public static final int EMPTY = 1;    // 사용하는 거
 
+    // 종료 방식
     public final static int END_TIME = 0;
     public final static int END_COUNT = 1;
 
@@ -73,28 +77,10 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void play() {
-        init();
-
-        level = getIntent().getIntExtra("curLevel", -1);
-        if (level > LOWER_BOUND && level < MainActivity.level.length) {
-            final Level curLevel = MainActivity.level[level];
-
-            // 게임 시작시 필요한 조건을 준비
-            score = 0;
-            missed = 0;
-            condition = curLevel.getCondition();
-            count = curLevel.getMoleNum();
-            width = curLevel.getWidth();
-            height = curLevel.getHeight();
-            map = curLevel.getMap();
-            end_method = curLevel.getEnd();
-            moles = curLevel.getMoleArr();
-            items = curLevel.getItemArr();
-
+        if (init()) {
             hole = new ImageButton[width * height];
 
             // curLevel.map에 따라 hole 초기화
-            String pkgName = getPackageName();
 
             int h = MAX_HEIGHT / height;
             final int WIDTH = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 0, getResources().getDisplayMetrics());
@@ -138,60 +124,42 @@ public class GameActivity extends AppCompatActivity {
                             ItemInfo info = (ItemInfo) ((ImageButton) v).getTag();
 
                             Log.d("난이도", "index : " + info.getIndex());
-                            if (!cursksdleh.equals(sksdleh[0]) && arrayList.size() != 0 && !String.valueOf(info.getIndex()).equals(arrayList.get(0))) {
-                                // 잘못 누른 경우
-                                if (((ImageButton) v).getTag().getClass().equals(MoleInfo.class)) { // 그 외의 다른 두더지를 잘못 잡으면
-                                    if (cursksdleh.equals(sksdleh[1])) { // Hard 난이도
-                                        return;
-                                    }
-                                    if (cursksdleh.equals(sksdleh[3])) { // Korean 난이도
-                                        score -= ((MoleInfo) info).getScore();  // 점수 감소
-
-                                        // 줄어듭니다
-                                        decrease();
-                                    }
-                                } else if (((ImageButton) v).getTag().getClass().equals(ItemInfo.class)) {  // 아이템
-                                    int intname = getIntname(info);
-
-                                    switch (intname) {
-                                        case 0: //폭탄을 눌렀을 때
-                                            // 아무 효과 없이 그냥 사라집니다.
-                                            break;
-                                        case 1: //비상벨을 눌렀을 때
-                                            // 제 기능을 합니다
-                                            int hap = bomb(intname);
-                                            score += (hap * items[intname].getScore());
-                                            break;
-                                            default:
-                                                break;
-                                    }
-                                }
-
-                            } else {    // 그때 올라와있는 '모든 것들 중'에서 '가장 먼저 올라왔던'
-                                Log.d("난이도", "엘스 안");
-                                //  터치 수 --
-                                info.setTouch(info.getTouch() - 1);
-                                //  터치 수 = 0?
-                                if (info.getTouch() == 0) {
+                            //  터치 수 --
+                            info.setTouch(info.getTouch() - 1);
+                            //  터치 수 = 0?
+                            if (info.getTouch() == 0) {
 //  두더지? 폭탄?
-                                    if (((ImageButton) v).getTag().getClass().equals(MoleInfo.class)) { // 두더지
-                                        Toast.makeText(getApplicationContext(), "good", Toast.LENGTH_LONG).show();
+                                if (((ImageButton) v).getTag().getClass().equals(MoleInfo.class)) { // 두더지
+                                    Toast.makeText(getApplicationContext(), "good", Toast.LENGTH_LONG).show();
 //  score += 점수
+                                    if (cursksdleh.equals(sksdleh[0])   // Normal
+                                            || checkIsFirst(info)) {    // 또는 가장 먼저
                                         score += ((MoleInfo) info).getScore();  // 점수를 얻고
+                                    } else {
+                                        if (cursksdleh.equals(sksdleh[1])) { // Hard 난이도
+                                            return; // 아무 반응이 없습니다
+                                        }
+                                        if (cursksdleh.equals(sksdleh[3])) { // Korean 난이도
+                                            score -= ((MoleInfo) info).getScore();  // 점수 감소
 
+                                            // 줄어듭니다
+                                            decrease(1);
+                                        }
+                                    }
 
-                                    } else if (((ImageButton) v).getTag().getClass().equals(ItemInfo.class)) {  // 아이템
-                                        Toast.makeText(getApplicationContext(), info.getName(), Toast.LENGTH_LONG).show();
-// TODO Hard 난이도
-                                        int intname = getIntname(info);
-
+                                } else if (((ImageButton) v).getTag().getClass().equals(ItemInfo.class)) {  // 아이템
+                                    Toast.makeText(getApplicationContext(), info.getName(), Toast.LENGTH_LONG).show();
+                                    int intname = getIntname(info);
+                                    if (cursksdleh.equals(sksdleh[0]) || cursksdleh.equals(sksdleh[1])  // Normal 이나 Hard
+                                            || intname == 1  // 또는 비상벨
+                                            || checkIsFirst(info)) {    // 또는 가장 먼저
                                         int hap = bomb(intname);
                                         score += (hap * items[intname].getScore());
                                     }
                                 }
                             }
 
-                            scoreView.setText(String.valueOf(score));
+                            scoreView.setText(String.valueOf(score) + "점");
                             Log.v("태그", "그림2");
                             // hole 초기화
                             holeInit(v, info.getIndex());
@@ -224,7 +192,7 @@ public class GameActivity extends AppCompatActivity {
                 //onClick 함수만 호출
             }
             // 쓰레드 시작
-            new Thread(new PThread(1, 2, 0.17)).start(); // TODO 각 레벨별 정보 입력해야 함.
+            new Thread(new PThread(minP, maxP,p)).start(); // 각 레벨별 정보 입력해야 함.
             //두더지 주기 최소, 최대, 아이템과 두더지 비율 순으로 입력하기!!!
         }
     }
@@ -239,8 +207,9 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private int getIntname(ItemInfo info) {  // 아이템 번호
-        if (items == null) { return -1; }
-        else {
+        if (items == null) {
+            return -1;
+        } else {
             for (int i = 0; i < items.length; i++) {
                 if (info.getName().equals(items[i].getName())) {
                     return i;
@@ -250,9 +219,9 @@ public class GameActivity extends AppCompatActivity {
         return -1;
     }
 
-    private void decrease() {   // 놓칠 수 있는 두더지 수
+    private void decrease(int n) {   // 놓칠 수 있는 두더지 수
         if (end_method == END_COUNT) {  // 놓친 두더지 수 방식일 경우
-            missed += 1;   // 놓친 것으로 카운트
+            missed += n;   // 놓친 것으로 카운트
 
             time.setText(condition - missed + "마리");
             if (missed == condition) {
@@ -261,13 +230,38 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    private void init() {
+    private boolean init() {
         time = findViewById(R.id.time);
 
         scoreView = findViewById(R.id.count);
         scoreView.setText(0 + "점");
 
         a_second = 1000;
+
+        level = getIntent().getIntExtra("curLevel", -1);
+        if (level > LOWER_BOUND && level < MainActivity.level.length) {
+
+            cursksdleh = sksdleh[getIntent().getIntExtra("cursksdleh", 0)];
+            final Level curLevel = MainActivity.level[level];
+            Log.d("등장 확률", "play: " + curLevel.getP());
+
+            // 게임 시작시 필요한 조건을 준비
+            score = 0;
+            missed = 0;
+            condition = curLevel.getCondition();
+            count = curLevel.getMoleNum();
+            width = curLevel.getWidth();
+            height = curLevel.getHeight();
+            map = curLevel.getMap();
+            end_method = curLevel.getEnd();
+            moles = curLevel.getMoleArr();
+            items = curLevel.getItemArr();
+            minP = curLevel.getMinP();
+            maxP = curLevel.getMaxP();
+            p = curLevel.getP();
+
+            return true;
+        } else return false;
     }
 
     class timeCheck implements Runnable {   // 시간을 1초씩 감소시키는 쓰레드 클래스
@@ -329,12 +323,12 @@ public class GameActivity extends AppCompatActivity {
                 Message msg2 = new Message();
                 double min = moles[anum].getUpMin(); // 올라와 있는 최소
                 double max = moles[anum].getUpMax(); // 올라와 있는 시간 최대
+                Log.d("올라와있는 시간", "run: " + min + " " + max);
                 int uptime = (int) ((min + new Random().nextDouble() * (max - min)) * 1000); // 두더지 올라와 있는 시간
 
                 ItemInfo info1 = (ItemInfo) ((ImageButton) hole[index]).getTag();
                 if (info1.getName().equals("0")) {
                     msg1.arg1 = index;
-//                    msg1.arg2 = anum;
                     msg1.obj = moles[anum];
                     upHandler.sendMessage(msg1);
                 }
@@ -343,7 +337,6 @@ public class GameActivity extends AppCompatActivity {
 
                 if (!info2.getName().equals("0")) {
                     msg2.arg1 = index;
-//                    msg2.arg2 = anum;
                     msg2.obj = moles[anum];
                     downHandler.sendMessage(msg2);
 
@@ -377,32 +370,27 @@ public class GameActivity extends AppCompatActivity {
 
                 double min = items[0].getUpMin();
                 double max = items[0].getUpMax();
+                Log.d("올라와있는 시간", "run: " + min + " " + max);
                 int uptime = (int) ((min + new Random().nextDouble() * (max - min)) * 1000); // 아이템 올라가 있는 시간
 
                 if (length > 1) { //아이템이 2개 이상일 때 나올 확률별로 나오게 하기
                     if (makeRandom(0.5)) {
                         msg1.arg1 = index;
-//                        msg1.arg2 = 0;
                         msg1.obj = items[0];
                         msg2.arg1 = index;
-//                        msg2.arg2 = 0;
                         msg2.obj = items[0];
 
                     } else {
                         msg1.arg1 = index;
-//                        msg1.arg2 = 1;
                         msg1.obj = items[1];
                         msg2.arg1 = index;
-//                        msg2.arg2 = 1;
                         msg2.obj = items[1];
 
                     }
                 } else { //아니면 그냥 나오게 하기
                     msg1.arg1 = index;
-//                    msg1.arg2 = 0;
                     msg1.obj = items[0];
                     msg2.arg1 = index;
-//                    msg2.arg2 = 0;
                     msg2.obj = items[0];
 
                 }
@@ -415,7 +403,7 @@ public class GameActivity extends AppCompatActivity {
 
                 ItemInfo info2 = (ItemInfo) ((ImageButton) hole[index]).getTag();
                 // Korean 난이도에서는 비상벨이 스스로 사라지지 않고 버틴다.
-                if (!info2.getName().equals("0") && info2.getName().equals("bell") && !cursksdleh.equals(sksdleh[3])) {
+                if ((!info2.getName().equals("0") && !(info2.getName().equals("bell") && cursksdleh.equals(sksdleh[3])))) {
                     downHandler.sendMessage(msg2);
 
                 }
@@ -466,26 +454,28 @@ public class GameActivity extends AppCompatActivity {
                             break;
                     }
 
-                    arrayList.add(String.valueOf(position)); // 배열 넣기
-                    Log.d("난이도", "배열 넣기 : " + arrayList.get(arrayList.size() - 1));
+//                    Log.d("난이도", "배열 넣기 : " + arrayList.get(arrayList.size() - 1));
 
                     if (items == null) { // 아이템이 없는 경우
                         Log.v("쓰레드", "잘나옴");
                         // 두더지 쓰레드 생성
-
+                        arrayList.add(String.valueOf(position)); // 배열 넣기
                         new Thread(new AThread(position)).start();
                         Log.v("쓰레드", "두더지쓰레드 생성");
                     } else {  // 아이템이 있는 경우 - 두더지 쓰레드와 아이템 쓰레드 비율에 맞게 생성
                         if (makeRandom(possibility)) {
+                            if (!cursksdleh.equals(sksdleh[1])) {
+                                arrayList.add(String.valueOf(position)); // 배열 넣기
+                            }
                             new Thread(new IThread(position)).start(); //아이템일 때
                             Log.v("쓰레드", "아이템쓰레드 생성");
                         } else {
+                            arrayList.add(String.valueOf(position)); // 배열 넣기
                             new Thread(new AThread(position)).start();
                             Log.v("쓰레드", "두더지쓰레드 생성");
 
                         }
                     }
-
 
                     Thread.sleep(period); // 잠들기
 
@@ -504,13 +494,11 @@ public class GameActivity extends AppCompatActivity {
 
             if (msg.obj.getClass() == Mole.class) { // 올라온 것이 두더지 일 때
                 Mole amole = (Mole) msg.obj;
-                //  msg.arg2
                 MoleInfo moleInfo = new MoleInfo(amole.getName(), amole.getTouch(), amole.getScore(), msg.arg1);
                 hole[msg.arg1].setTag(moleInfo);
                 hole[msg.arg1].setImageResource(amole.getImage()); // 이미지 바꿀 수 있어야 함.
             } else { // 올라온 것이 아이템
                 Item aitem = (Item) msg.obj;
-                //  msg.arg2
                 ItemInfo itemInfo = new ItemInfo(aitem.getName(), aitem.getTouch(), msg.arg1);
                 hole[msg.arg1].setTag(itemInfo);
                 hole[msg.arg1].setImageResource(aitem.getImage());
@@ -529,7 +517,7 @@ public class GameActivity extends AppCompatActivity {
             Log.d("난이도", "뺀 것 : " + arrayList.contains(String.valueOf(msg.arg1)));
             if (msg.obj.getClass() == Mole.class) {
                 // 줄어듭니다
-                decrease();
+                decrease(1);
 
             }
         }
@@ -549,6 +537,13 @@ public class GameActivity extends AppCompatActivity {
         Intent intent = new Intent(GameActivity.this, MainActivity.class);
         intent.putExtra("curLevel", level);
         intent.putExtra("end", end_method);
+        int c = 0;
+        for (int i = 0; i < 4; i++) {
+            if (cursksdleh.equals(sksdleh[i])) {
+                c = i;
+            }
+        }
+        intent.putExtra("cursksdleh", c);
 
         if (score >= count) {
             intent.putExtra("isWin", 1);
@@ -563,8 +558,6 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    ;
-
     private boolean makeRandom(double num) {
         double result = 0;
         double random = Math.random(); //0~1 실수
@@ -575,16 +568,21 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    private boolean checkIsFirst(ItemInfo info) {
+        if (arrayList.size() != 0 && String.valueOf(info.getIndex()).equals(arrayList.get(0)))
+            return true;
+        else return false;
+    }
+
     private int bomb(int b) {    // 폭탄 아이템을 사용할 때 맵 위에 있는 두더지의 총 점수를 계산하고         더하는 함수
         int hap = 0;  // 아이템을 사용해서 얻는 점수를 저장
 
         for (int i = 0; i < hole.length; i++) {
 
-
             if (((ImageButton) hole[i]).getTag().getClass().equals(MoleInfo.class)) {
                 Toast.makeText(getApplicationContext(), "good", Toast.LENGTH_LONG).show();
                 // 줄어듭니다
-                decrease();
+                decrease(items[b].getPeriod());
 
 //  score += 점수
                 MoleInfo moleInfo = (MoleInfo) hole[i].getTag();
@@ -595,30 +593,5 @@ public class GameActivity extends AppCompatActivity {
 
         }
         return hap;
-    }
-
-    ;
-
-    private void bell() {   // 두더지들을 몽땅 놓치는
-        for (int i = 0; i < hole.length; i++) {
-            if (((ImageButton) hole[i]).getTag().getClass().equals(MoleInfo.class)) {  // hole[i].getTag() == TAG_ON
-                if (((ImageButton) hole[i]).getTag().getClass().equals(MoleInfo.class)) {
-                    Toast.makeText(getApplicationContext(), "good", Toast.LENGTH_LONG).show();
-                    missed++;   // 놓친 것으로 카운트
-
-                    time.setText(condition - missed + "마리");
-                    if (missed == condition) {
-                        end(score); // 종료 함수 호출
-                    }
-                }
-
-                // 두더지들은 사라지지만
-                hole[i].setImageResource(R.drawable.ic_launcher_foreground);
-//
-                ItemInfo itemInfo = new ItemInfo("0", 0, -1);
-                hole[i].setTag(itemInfo);
-
-            }
-        }
     }
 }

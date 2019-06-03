@@ -1,186 +1,306 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="300dp"
-    android:layout_height="wrap_content">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--&gt;-->
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="맵 가로/세로:" />
-
-        <EditText
-            android:id="@+id/c_width"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="가로"
-            android:inputType="number" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="/" />
-
-        <EditText
-            android:id="@+id/c_height"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="세로"
-            android:inputType="number" />
-
-        <Button
-            android:id="@+id/mapBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:text="체크" />
-
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:text="종료방식:"
-            android:layout_width="0dp"
-            android:layout_weight="3"
-            android:layout_height="wrap_content" />
-        <RadioGroup
-            android:id="@+id/c_radio"
-            android:layout_width="0dp"
-            android:layout_weight="7"
-            android:layout_height="wrap_content">
-            <RadioButton
-                android:id="@+id/c_endmiss"
-                android:text="놓친 두더지 방식"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <RadioButton
-                android:id="@+id/c_endtime"
-                android:text="시간 제한 방식"
-                android:checked="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </RadioGroup>
-
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/c_text"
-            android:text="총제한시간"
-            android:layout_width="0dp"
-            android:layout_weight="3"
-            android:layout_height="wrap_content" />
-        <EditText
-            android:id="@+id/c_limit"
-            android:inputType="number"
-            android:layout_width="0dp"
-            android:layout_weight="7"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:text="잡아야 하는 두더지 총 개수"
-            android:layout_width="0dp"
-            android:layout_weight="3"
-            android:layout_height="wrap_content" />
-        <EditText
-            android:id="@+id/c_totalNum"
-            android:inputType="number"
-            android:layout_width="0dp"
-            android:layout_weight="7"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:text="올라와있는 시간 (최소, 최대)"
-            android:layout_width="0dp"
-            android:layout_weight="7"
-            android:layout_height="wrap_content" />
-        <EditText
-            android:id="@+id/c_upTimeMIN"
-            android:inputType="numberDecimal"
-            android:layout_width="0dp"
-            android:layout_weight="3.5"
-            android:layout_height="wrap_content" />
-        <EditText
-            android:id="@+id/c_upTimeMAX"
-            android:inputType="numberDecimal"
-            android:layout_width="0dp"
-            android:layout_weight="3.5"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:text="아이템사용"
-            android:layout_width="0dp"
-            android:layout_weight="3"
-            android:layout_height="wrap_content" />
-        <CheckBox
-            android:id="@+id/c_itemCheck"
-            android:layout_width="0dp"
-            android:layout_weight="7"
-            android:layout_height="wrap_content"
-            />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    </LinearLayout>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#000000"/>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/c_cancelButton"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="취소"
-            android:textColor="#000000"
-            android:textSize="16dp"
-            android:background="#ffffff"/>
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="맵 가로/세로:" />
+
+            <EditText
+                android:id="@+id/c_width"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="가로"
+                android:inputType="number" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="/" />
+
+            <EditText
+                android:id="@+id/c_height"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="세로"
+                android:inputType="number" />
+
+            <Button
+                android:id="@+id/mapBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:text="체크" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="종료방식:" />
+
+            <RadioGroup
+                android:id="@+id/c_radio"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="7">
+
+                <RadioButton
+                    android:id="@+id/c_endmiss"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="놓친 두더지 방식" />
+
+                <RadioButton
+                    android:id="@+id/c_endtime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="시간 제한 방식" />
+            </RadioGroup>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/c_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="총제한시간" />
+
+            <EditText
+                android:id="@+id/c_limit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="7"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="잡아야 하는 두더지 총 개수" />
+
+            <EditText
+                android:id="@+id/c_totalNum"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="7"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="7"
+                android:text="두더지가 올라와 있는 시간 (최소, 최대)" />
+
+            <EditText
+                android:id="@+id/c_upTimeMIN"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3.5"
+                android:inputType="numberDecimal" />
+
+            <EditText
+                android:id="@+id/c_upTimeMAX"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3.5"
+                android:inputType="numberDecimal" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="7"
+                android:text="두더지 등장까지 시간 (최소, 최대)" />
+
+            <EditText
+                android:id="@+id/c_downTimeMIN"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3.5"
+                android:inputType="numberDecimal" />
+
+            <EditText
+                android:id="@+id/c_downTimeMAX"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3.5"
+                android:inputType="numberDecimal" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="난이도" />
+
+            <RadioGroup
+                android:id="@+id/c_difficulty"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="7">
+
+                <RadioButton
+                    android:id="@+id/c_normal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Normal" />
+
+                <RadioButton
+                    android:id="@+id/c_hard"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hard" />
+
+                <RadioButton
+                    android:id="@+id/c_nightmare"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nightmare" />
+
+                <RadioButton
+                    android:id="@+id/c_korean"
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+                    android:text="Korean" />
+            </RadioGroup>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="아이템사용" />
+
+            <CheckBox
+                android:id="@+id/c_itemCheck"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="7" />
+
+            <TextView
+                android:id="@+id/c_itemText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="아이템확률"
+                android:visibility="invisible" />
+
+            <EditText
+                android:id="@+id/c_itemProb"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3.5"
+                android:inputType="numberDecimal"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
         <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
             android:background="#000000" />
 
-        <Button
-            android:id="@+id/c_okButton"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:layout_weight="1"
-            android:background="#ffffff"
-            android:gravity="center"
-            android:text="확인"
-            android:textColor="#000000"
-            android:textSize="16dp" />
+            android:orientation="horizontal">
 
+            <Button
+                android:id="@+id/c_cancelButton"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:background="#ffffff"
+                android:gravity="center"
+                android:text="취소"
+                android:textColor="#000000"
+                android:textSize="16dp" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#000000" />
+
+            <Button
+                android:id="@+id/c_okButton"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:background="#ffffff"
+                android:gravity="center"
+                android:text="확인"
+                android:textColor="#000000"
+                android:textSize="16dp" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#000000" />
     </LinearLayout>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#000000"/>
-</LinearLayout>
+    <!--</LinearLayout>-->
+</ScrollView>

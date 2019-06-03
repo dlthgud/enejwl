@@ -107,6 +107,55 @@
 
     </RadioGroup>
 
+    <RadioGroup
+        android:id="@+id/sksdleh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/start"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/end_mode">
+
+        <RadioButton
+            android:id="@+id/normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Normal"
+            tools:layout_editor_absoluteX="166dp"
+            tools:layout_editor_absoluteY="567dp" />
+
+        <RadioButton
+            android:id="@+id/hard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hard"
+            tools:layout_editor_absoluteX="166dp"
+            tools:layout_editor_absoluteY="618dp" />
+
+        <RadioButton
+            android:id="@+id/nightmare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nightmare"
+            tools:layout_editor_absoluteX="166dp"
+            tools:layout_editor_absoluteY="618dp" />
+
+        <RadioButton
+            android:id="@+id/korean"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Korean"
+            tools:layout_editor_absoluteX="166dp"
+            tools:layout_editor_absoluteY="618dp" />
+
+    </RadioGroup>
+
     <ImageButton
         android:id="@+id/imageView"
         android:layout_width="0dp"

@@ -9,8 +9,36 @@ public class Level {    // 한 레벨의 정보를 저장하는 클래스
     Mole[] moleArr; // 레벨에서 사용할 두더지 객체 배열
     Item[] itemArr; // 레벨에서 사용할 아이템 객체 배열
     int end;    // 종료 방식 (0: 시간 제한, 1: n마리 놓침)
+    double minP;   // 두더지 주기 최소
+    double maxP;   // 두더지 주기 최대
+    double P;  // 아이템과 두더지 비율
 
-    public Level(int[] map, int width, int height, int condition, int moleNum, int end, Mole[] moleArr, Item[] itemArr) {
+    public double getMinP() {
+        return minP;
+    }
+
+    public void setMinP(double minP) {
+        this.minP = minP;
+    }
+
+    public double getMaxP() {
+        return maxP;
+    }
+
+    public void setMaxP(double maxP) {
+        this.maxP = maxP;
+    }
+
+    public double getP() {
+        return P;
+    }
+
+    public void setP(double p) {
+        P = p;
+    }
+
+    public Level(int[] map, int width, int height, int condition, int moleNum, int end, Mole[] moleArr, Item[] itemArr,
+                 double minP, double maxP, double P) {
         this.map = map;
         this.width = width;
         this.height = height;
@@ -19,6 +47,9 @@ public class Level {    // 한 레벨의 정보를 저장하는 클래스
         this.end = end;
         this.moleArr = moleArr;
         this.itemArr = itemArr;
+        this.minP = minP;
+        this.maxP = maxP;
+        this.P = P;
     }
 
     public int[] getMap() {
