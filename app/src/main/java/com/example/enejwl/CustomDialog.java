@@ -229,7 +229,12 @@ public class CustomDialog {
                     double maxUp = Double.parseDouble(upTimeMax.getText().toString());  // 올라와 있는 시간 최대
                     double minDown = Double.parseDouble(downTimeMin.getText().toString());  // 내려가 있는 시간 최소
                     double maxDown = Double.parseDouble(downTimeMax.getText().toString());  // 내려가 있는 시간 최대
-                    int item = Integer.parseInt(itemProb.getText().toString());    // 아이템 확률
+                    int item;
+                    if (itemCheck.isChecked()) {
+                        item = Integer.parseInt(itemProb.getText().toString());    // 아이템 확률
+                    } else {
+                        item = 0;
+                    }
                     if ((endType == GameActivity.END_COUNT && limitInt > MAX_NUM)   // 놓칠 수 있는 두더지 수 검사
                             || (endType == GameActivity.END_TIME && (limitInt>MAX_TIME || limitInt<MIN_TIME))   // 제한 시간 검사
                             || totalNumInt > MAX_T  || totalNumInt<MIN_T  // 두더지수 검사
