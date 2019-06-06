@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     public static Item bell = new Item("bell", 1, 0, 5,3, R.drawable.bell, 1);   // 비상벨
     public static Item[] items = {bomb, bell};    // 아이템 객체 생성
 
-    int[] sksdlehs = {R.id.normal, R.id.hard, R.id.nightmare, R.id.korean};
+    public static int[] sksdlehs = {R.id.normal, R.id.hard, R.id.nightmare, R.id.korean};
     // 현재
     int curLevel;   // 레벨
     int end;    // 종료 방식
